@@ -23,6 +23,6 @@ class Autoloader
      */
     public static function autoload($class)
     {
-        require str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
+        require __DIR__.'/../'.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
     }
 }

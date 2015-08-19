@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+
+<?php
+
+require 'Helper/Autoloader.php';
+
+Helper\Autoloader::register();
+
+
+/**
+ * @return void
+ */
+function usage()
+{
+    echo "Available commands : \n";
+    echo "\t remove \t - Remove all the episode marked as watched on betaseries\n";
+    echo "\t move \t\t - Move the downloaded files into the right show directory\n";
+    echo "\t subtitle \t - Download the best subtitle for the episode, if available on betaseries\n";
+    die();
+}
+
+$commands = [
+    'remove'   => 'Command\RemoveCommand',
+    'move'     => 'Command\MoveCommand',
+    'subtitle' => 'Command\DownloadSubtitleCommand'
+];
+
+$arguments = $argv;
+
+if (count($arguments) == 1 || (isset($arguments[1]) && !array_key_exists($arguments[1], $commands))) {
+    usage();
+}
+
+$command = new $commands[$arguments[1]]();
+$command->execute();
