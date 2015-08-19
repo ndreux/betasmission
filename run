@@ -20,7 +20,7 @@ function usage()
 }
 
 $commands = [
-    'remove'   => 'Command\RemoveCommand',
+    'remove'   => 'Command\RemoveWatchedCommand',
     'move'     => 'Command\MoveCommand',
     'subtitle' => 'Command\DownloadSubtitleCommand'
 ];
