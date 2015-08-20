@@ -1,6 +1,6 @@
 <?php
 
-namespace Helper;
+namespace BetasMission\Helper;
 
 /**
  * Class Locker.
