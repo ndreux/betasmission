@@ -11,9 +11,9 @@ use PHPUnit_Framework_TestCase;
  */
 class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @throws \Exception
+     *
      * @return mixed
      */
     public function testGetEpisodeData()
@@ -23,11 +23,12 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
         $fileName = 'A.Developers.Life.S01E01.mp4';
         $result   = $apiWrapper->getEpisodeData($fileName);
 
-        $this->assertInstanceOf("stdClass", $result);
+        $this->assertInstanceOf('stdClass', $result);
     }
 
     /**
      * @throws \Exception
+     *
      * @return mixed
      *
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
@@ -42,8 +43,8 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @throws \Exception
+     *
      * @return mixed
      *
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
@@ -58,10 +59,9 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @throws \Exception
-     * @return mixed
      *
+     * @return mixed
      */
     public function testGetSubtitleByEpisodeId()
     {
@@ -71,6 +71,6 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
         $language  = 'all';
         $result    = $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
 
-        $this->assertInstanceOf("stdClass", $result);
+        $this->assertInstanceOf('stdClass', $result);
     }
 }

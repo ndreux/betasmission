@@ -57,8 +57,8 @@ class BetaseriesApiWrapper
      * @param $episodeFileName
      *
      * @throws \Exception
-     * @return StdClass
      *
+     * @return StdClass
      */
     public function getEpisodeData($episodeFileName)
     {
@@ -88,8 +88,8 @@ class BetaseriesApiWrapper
      * @param int $episodeId
      *
      * @throws \Exception
-     * @return StdClass
      *
+     * @return StdClass
      */
     public function markAsDownloaded($episodeId)
     {
@@ -121,8 +121,8 @@ class BetaseriesApiWrapper
      * @param int $episodeId
      *
      * @throws \Exception
-     * @return StdClass
      *
+     * @return StdClass
      */
     public function markAsWatched($episodeId)
     {
@@ -155,8 +155,8 @@ class BetaseriesApiWrapper
      * @param string $language
      *
      * @throws \Exception
-     * @return StdClass
      *
+     * @return StdClass
      */
     public function getSubtitleByEpisodeId($episodeId, $language = 'vo')
     {
@@ -184,8 +184,8 @@ class BetaseriesApiWrapper
 
     /**
      * @throws \Exception
-     * @return bool
      *
+     * @return bool
      */
     private function authenticate()
     {

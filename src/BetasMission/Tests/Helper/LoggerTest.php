@@ -12,7 +12,6 @@ use PHPUnit_Framework_TestCase;
 class LoggerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @return void
      */
     public function testLog()
     {
@@ -23,7 +22,6 @@ class LoggerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testLogWithContext()
     {

@@ -14,7 +14,6 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
     const FROM    = '/mnt/smb/Labox/Series/Actives/';
 
     /**
-     * @return void
      */
     public function execute()
     {
@@ -62,8 +61,8 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
      * @param int $episodeId
      *
      * @throws \Exception
-     * @return null|stdClass
      *
+     * @return null|stdClass
      */
     private function getBestSubtitle($episodeId)
     {

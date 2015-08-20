@@ -12,7 +12,6 @@ use PHPUnit_Framework_TestCase;
 class LockerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @return void
      */
     public function testLock()
     {
@@ -23,7 +22,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testLockWithContext()
     {
@@ -34,7 +32,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testIsLocked()
     {
@@ -47,7 +44,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testIsLockedWithContext()
     {
@@ -60,7 +56,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testIsUnLocked()
     {
@@ -72,7 +67,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testIsUnLockedWithContext()
     {
@@ -84,7 +78,6 @@ class LockerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testUnLock()
     {
@@ -92,11 +85,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $result = $locker->unlock();
 
         $this->assertTrue($result);
-
     }
 
     /**
-     * @return void
      */
     public function testIsUnLockWithContext()
     {
@@ -105,5 +96,4 @@ class LockerTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($result);
     }
-
 }

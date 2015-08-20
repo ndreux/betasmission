@@ -13,7 +13,6 @@ use PHPUnit_Framework_TestCase;
 class MoveCommandTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @return void
      */
     public function testPreExecuteAlreadyLocked()
     {
@@ -28,7 +27,6 @@ class MoveCommandTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testPreExecute()
     {
@@ -43,7 +41,6 @@ class MoveCommandTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testPostExecute()
     {

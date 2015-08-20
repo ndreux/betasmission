@@ -11,7 +11,6 @@ use PHPUnit_Framework_TestCase;
 class ContextTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @return void
      */
     public function testGetAvailableContexts()
     {
