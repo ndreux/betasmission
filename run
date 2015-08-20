@@ -2,12 +2,9 @@
 
 <?php
 
-use Command\CommandInterface;
+use BetasMission\Command\CommandInterface;
 
-require 'Helper/Autoloader.php';
-
-Helper\Autoloader::register();
-
+require __DIR__ . '/vendor/autoload.php';
 
 /**
  * @return void
@@ -21,9 +18,9 @@ function usage()
 }
 
 $commands = [
-    'remove'   => 'Command\RemoveWatchedCommand',
-    'move'     => 'Command\MoveCommand',
-    'subtitle' => 'Command\DownloadSubtitleCommand'
+    'remove'   => 'BetasMission\Command\RemoveWatchedCommand',
+    'move'     => 'BetasMission\Command\MoveCommand',
+    'subtitle' => 'BetasMission\Command\DownloadSubtitleCommand'
 ];
 
 $arguments = $argv;

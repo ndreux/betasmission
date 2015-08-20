@@ -1,8 +1,8 @@
 <?php
 
-namespace Command;
+namespace BetasMission\Command;
 
-use Helper\Context;
+use BetasMission\Helper\Context;
 
 /**
  * Class RemoveWatchedCommand.

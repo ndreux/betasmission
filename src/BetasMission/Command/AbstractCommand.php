@@ -1,10 +1,10 @@
 <?php
 
-namespace Command;
+namespace BetasMission\Command;
 
-use Helper\BetaseriesApiWrapper;
-use Helper\Locker;
-use Helper\Logger;
+use BetasMission\Helper\BetaseriesApiWrapper;
+use BetasMission\Helper\Locker;
+use BetasMission\Helper\Logger;
 
 /**
  * Class AbstractCommand.
