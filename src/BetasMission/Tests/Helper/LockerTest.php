@@ -1,6 +1,6 @@
 <?php
 
-namespace src\BetasMission\Tests\Helper;
+namespace BetasMission\Tests\Helper;
 
 use BetasMission\Helper\Context;
 use BetasMission\Helper\Locker;
@@ -11,6 +11,9 @@ use PHPUnit_Framework_TestCase;
  */
 class LockerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return void
+     */
     public function testLock()
     {
         $locker = new Locker();
@@ -19,6 +22,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
     }
 
+    /**
+     * @return void
+     */
     public function testLockWithContext()
     {
         $locker = new Locker(Context::CONTEXT_MOVE);
@@ -27,6 +33,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
     }
 
+    /**
+     * @return void
+     */
     public function testIsLocked()
     {
         $locker = new Locker();
@@ -37,6 +46,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * @return void
+     */
     public function testIsLockedWithContext()
     {
         $locker = new Locker(Context::CONTEXT_MOVE);
@@ -47,6 +59,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * @return void
+     */
     public function testIsUnLocked()
     {
         $locker = new Locker();
@@ -56,6 +71,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @return void
+     */
     public function testIsUnLockedWithContext()
     {
         $locker = new Locker(Context::CONTEXT_MOVE);
@@ -65,6 +83,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @return void
+     */
     public function testUnLock()
     {
         $locker = new Locker();
@@ -74,6 +95,9 @@ class LockerTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * @return void
+     */
     public function testIsUnLockWithContext()
     {
         $locker = new Locker(Context::CONTEXT_MOVE);

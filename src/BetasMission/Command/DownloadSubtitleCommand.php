@@ -13,6 +13,9 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
     const CONTEXT = Context::CONTEXT_DOWNLOAD_SUBTITLE;
     const FROM    = '/mnt/smb/Labox/Series/Actives/';
 
+    /**
+     * @return void
+     */
     public function execute()
     {
         $shows = array_diff(scandir(self::FROM), ['..', '.']);
@@ -68,7 +71,7 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
 
         $this->logger->log(count($subtitles).' found');
 
-        /** @var StdClass|null $bestSubtitle */
+        /** @var stdClass|null $bestSubtitle */
         $bestSubtitle = null;
 
         foreach ($subtitles->subtitles as $subtitle) {
@@ -88,7 +91,7 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
 
     /**
      * @param string   $episode
-     * @param StdClass $subtitle
+     * @param stdClass $subtitle
      *
      * @return bool
      */

@@ -1,6 +1,6 @@
 <?php
 
-namespace src\BetasMission\Tests\Helper;
+namespace BetasMission\Tests\Helper;
 
 use BetasMission\Helper\Context;
 use BetasMission\Helper\Logger;
@@ -11,6 +11,9 @@ use PHPUnit_Framework_TestCase;
  */
 class LoggerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return void
+     */
     public function testLog()
     {
         $logger = new Logger();
@@ -19,6 +22,9 @@ class LoggerTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
     }
 
+    /**
+     * @return void
+     */
     public function testLogWithContext()
     {
         $logger = new Logger(Context::CONTEXT_MOVE);

@@ -55,9 +55,8 @@ class AbstractCommand
     public function postExecute()
     {
         $this->logger->log('Unlock');
-        $this->locker->unlock();
 
-        return true;
+        return $this->locker->unlock();
     }
 
     /**

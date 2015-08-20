@@ -10,6 +10,9 @@ use PHPUnit_Framework_TestCase;
  */
 class ContextTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return void
+     */
     public function testGetAvailableContexts()
     {
         $this->assertContains(Context::CONTEXT_DOWNLOAD_SUBTITLE, Context::getAvailableContexts());

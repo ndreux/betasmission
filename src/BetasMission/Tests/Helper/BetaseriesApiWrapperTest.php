@@ -1,6 +1,6 @@
 <?php
 
-namespace src\BetasMission\Tests\Helper;
+namespace BetasMission\Tests\Helper;
 
 use BetasMission\Helper\BetaseriesApiWrapper;
 use Exception;
@@ -13,7 +13,6 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-     *
      * @throws \Exception
      * @return mixed
      */
@@ -28,8 +27,6 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $episodeId
-     *
      * @throws \Exception
      * @return mixed
      *
