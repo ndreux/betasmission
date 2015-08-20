@@ -11,7 +11,6 @@ use Helper\Logger;
  */
 class AbstractCommand
 {
-
     const CONTEXT = null;
 
     /** @var  BetaseriesApiWrapper */
@@ -34,6 +33,34 @@ class AbstractCommand
     }
 
     /**
+     * @return bool
+     */
+    public function preExecute()
+    {
+        if ($this->locker->isLocked()) {
+            $this->logger->log('The script is locked.');
+
+            return false;
+        }
+
+        $this->logger->log('Lock');
+        $this->locker->lock();
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function postExecute()
+    {
+        $this->logger->log('Unlock');
+        $this->locker->unlock();
+
+        return true;
+    }
+
+    /**
      * @param string $src
      *
      * @return bool
@@ -46,12 +73,12 @@ class AbstractCommand
                 if (is_dir($src.'/'.$file)) {
                     $this->recurseRmdir($src.'/'.$file);
                 } else {
-                    $this->logger->log("Remove : ".$src."/".$file);
+                    $this->logger->log('Remove : '.$src.'/'.$file);
                     unlink($src.'/'.$file);
                 }
             }
         }
-        $this->logger->log("Remove : ".$src);
+        $this->logger->log('Remove : '.$src);
         rmdir($src);
         closedir($dir);
 

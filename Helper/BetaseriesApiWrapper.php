@@ -8,18 +8,18 @@ namespace Helper;
 class BetaseriesApiWrapper
 {
     const API_BASE_PATH = 'https://api.betaseries.com/';
-    const LOGIN = 'ndreux';
+    const LOGIN         = 'ndreux';
     const PASSWORD_HASH = '370328edae152a82a8bc0970c9bfb20e';
-    const API_KEY = 'c8bb2471b101';
+    const API_KEY       = 'c8bb2471b101';
 
     private $token;
 
     /**
      * @param $episodeFileName
      *
+     * @throws \Exception
      * @return mixed
      *
-     * @throws \Exception
      */
     public function getEpisodeData($episodeFileName)
     {
@@ -27,7 +27,7 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'file' => $episodeFileName];
+        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'file' => $episodeFileName];
         $searchQuery = self::API_BASE_PATH.'episodes/scraper?'.http_build_query($parameters);
 
         $curlResource = curl_init();
@@ -48,9 +48,9 @@ class BetaseriesApiWrapper
     /**
      * @param $episodeId
      *
+     * @throws \Exception
      * @return mixed
      *
-     * @throws \Exception
      */
     public function markAsDownloaded($episodeId)
     {
@@ -58,7 +58,7 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
+        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
         $searchQuery = self::API_BASE_PATH.'episodes/downloaded';
 
         $curlResource = curl_init();
@@ -81,9 +81,9 @@ class BetaseriesApiWrapper
     /**
      * @param int $episodeId
      *
+     * @throws \Exception
      * @return mixed
      *
-     * @throws \Exception
      */
     public function markAsWatched($episodeId)
     {
@@ -91,7 +91,7 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
+        $parameters   = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
         $watchedQuery = self::API_BASE_PATH.'episodes/watched';
 
         $curlResource = curl_init();
@@ -114,8 +114,9 @@ class BetaseriesApiWrapper
     /**
      * @param int $episodeId
      *
-     * @return mixed
      * @throws \Exception
+     * @return mixed
+     *
      */
     public function getSubtitleByEpisodeId($episodeId, $language = 'vo')
     {
@@ -123,7 +124,7 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
+        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
         $searchQuery = self::API_BASE_PATH.'subtitles/episode?'.http_build_query($parameters);
 
         $curlResource = curl_init();
@@ -142,14 +143,14 @@ class BetaseriesApiWrapper
     }
 
     /**
+     * @throws \Exception
      * @return bool
      *
-     * @throws \Exception
      */
     private function authenticate()
     {
         $authenticateUrl = self::API_BASE_PATH.'members/auth';
-        $parameters = ['login' => self::LOGIN, 'password' => self::PASSWORD_HASH, 'key' => self::API_KEY, 'v' => '2.4'];
+        $parameters      = ['login' => self::LOGIN, 'password' => self::PASSWORD_HASH, 'key' => self::API_KEY, 'v' => '2.4'];
 
         $curlResource = curl_init();
 

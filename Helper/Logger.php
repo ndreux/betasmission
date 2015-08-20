@@ -9,7 +9,6 @@ use DateTime;
  */
 class Logger
 {
-
     const LOG_PATH = '/var/log/betasmission/';
     const LOG_FILE = 'betasmission-%s';
 

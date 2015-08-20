@@ -19,15 +19,6 @@ class MoveCommand extends AbstractCommand implements CommandInterface
      */
     public function execute()
     {
-        if ($this->locker->isLocked()) {
-            $this->logger->log('The script is locked.');
-
-            return;
-        }
-
-        $this->logger->log('Lock');
-        $this->locker->lock();
-
         $episodes = array_diff(scandir(self::FROM), ['..', '.']);
 
         foreach ($episodes as $episode) {
@@ -45,9 +36,6 @@ class MoveCommand extends AbstractCommand implements CommandInterface
                 $this->logger->log('Marked the episode has downloaded');
             }
         }
-
-        $this->locker->unlock();
-        $this->logger->log('Unlock');
     }
 
     /**

@@ -30,9 +30,16 @@ $arguments = $argv;
 
 if (count($arguments) == 1 || (isset($arguments[1]) && !array_key_exists($arguments[1], $commands))) {
     usage();
+
     return -1;
 }
 
 /** @var CommandInterface $command */
 $command = new $commands[$arguments[1]]();
+
+if (!$command->preExecute()) {
+    return -1;
+}
+
 $command->execute();
+$command->postExecute();

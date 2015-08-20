@@ -15,18 +15,9 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
 
     public function execute()
     {
-        if ($this->locker->isLocked()) {
-            $this->logger->log('The script is locked.');
-
-            return;
-        }
-
-        $this->logger->log('Lock');
-        $this->locker->lock();
-
         $shows = array_diff(scandir(self::FROM), ['..', '.']);
 
-        $this->logger->log(count($shows)." found");
+        $this->logger->log(count($shows).' found');
 
         foreach ($shows as $show) {
             $this->logger->log('Show : '.$show);
@@ -36,7 +27,7 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
                 $this->logger->log($episode);
 
                 if ($i % 30 == 0) {
-                    $this->logger->log("Wait 20s");
+                    $this->logger->log('Wait 20s');
                     sleep(20);
                 }
 
@@ -48,31 +39,28 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
                 try {
                     $episodeData = $this->apiWrapper->getEpisodeData($episode);
                 } catch (\Exception $e) {
-                    $this->logger->log("Episode not found on BetaSeries");
+                    $this->logger->log('Episode not found on BetaSeries');
                     continue;
                 }
 
                 $subtitle = $this->getBestSubtitle($episodeData->episode->id);
 
                 if ($subtitle === null) {
-                    $this->logger->log("Subtitles not found on BetaSeries");
+                    $this->logger->log('Subtitles not found on BetaSeries');
                     continue;
                 }
 
                 $this->applySubTitle(self::FROM.$show.'/'.$episode, $subtitle);
             }
         }
-
-        $this->logger->log('Unlock');
-        $this->locker->unlock();
-
     }
 
     /**
      * @param int $episodeId
      *
-     * @return null|stdClass
      * @throws \Exception
+     * @return null|stdClass
+     *
      */
     private function getBestSubtitle($episodeId)
     {
@@ -106,11 +94,9 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
      */
     private function applySubTitle($episode, $subtitle)
     {
-
         $subtitleFilePath = $this->getSubtitleFilePath($subtitle->url, $subtitle->file);
 
         if (is_dir($episode)) {
-
             $files = array_diff(scandir($episode), ['..', '.']);
 
             foreach ($files as $file) {
@@ -130,9 +116,7 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
                 $this->logger->log('Subtitle applied');
 
                 return true;
-
             }
-
         } else {
             $filePathInfo          = pathinfo($episode);
             $destination           = $filePathInfo['dirname'];
@@ -155,7 +139,6 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
      */
     private function getSubtitleFilePath($subtitleUrl, $subtitleLabel)
     {
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $subtitleUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -176,7 +159,6 @@ class DownloadSubtitleCommand extends AbstractCommand implements CommandInterfac
      */
     private function episodeHasSubtitle($episode)
     {
-
         if (is_dir($episode)) {
             $files = array_diff(scandir($episode), ['..', '.']);
 
