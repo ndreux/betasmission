@@ -1,0 +1,7 @@
+raspbian:
+  build: build
+  volumes:
+    - ./:/home/pi/betasmission
+    - ./build/fixtures/:/mnt/smb/Labox/
+  ports:
+    - "2222:22"
