@@ -14,7 +14,9 @@ use PHPUnit_Framework_TestCase;
  */
 class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
 {
-
+    /**
+     * @return void
+     */
     public function testExecuteNoOrphanLock()
     {
         $locker = new Locker();
@@ -27,6 +29,9 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
         $locker->unlock();
     }
 
+    /**
+     * @return void
+     */
     public function testExecuteOrphanLock()
     {
         /** @var PHPUnit_Framework_MockObject_MockObject|CheckOrphanLockCommand $command */
@@ -45,13 +50,14 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
         $locker->lock();
 
         $command->execute();
+
+        $locker->unlock();
     }
 
     /**
      * @dataProvider executeWithContextLockDataProvider
-     * @param $context
      *
-     * @return void
+     * @param $context
      */
     public function testExecuteOrphanContextLock($context)
     {
@@ -71,14 +77,14 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
         $locker->lock();
 
         $command->execute();
+
+        $locker->unlock();
     }
 
     /**
      * @dataProvider executeWithContextLockDataProvider
      *
      * @param $context
-     *
-     * @return void
      */
     public function testExecuteWithContextNoOrphanLock($context)
     {
