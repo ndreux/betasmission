@@ -26,7 +26,7 @@ class CheckOrphanLockCommand extends AbstractCommand implements CommandInterface
 
             $lockFileTimeStamp = $this->getTimeStampLock(Locker::LOCK_PATH.$tempFile);
             if ((new DateTime())->getTimestamp() > $lockFileTimeStamp + 3600) {
-                return $this->sendAlert($tempFile, (new DateTime)->setTimestamp($lockFileTimeStamp));
+                return $this->sendAlert($tempFile, (new DateTime())->setTimestamp($lockFileTimeStamp));
             }
         }
 

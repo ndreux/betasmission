@@ -9,7 +9,6 @@ use DateTime;
  */
 class OrphanLockMessage extends AbstractMessage
 {
-
     /**
      * @var string
      */
