@@ -12,9 +12,10 @@ require __DIR__.'/vendor/autoload.php';
 function usage()
 {
     echo "Available commands : \n";
-    echo "\t remove \t - Delete all episodes marked as watched on betaseries\n";
-    echo "\t move \t\t - Move the downloaded files into the right show directory\n";
-    echo "\t subtitle \t - Download the best subtitle for the episodes, if available\n";
+    echo "\t remove \t\t\t - Delete all episodes marked as watched on betaseries\n";
+    echo "\t move \t\t\t\t - Move the downloaded files into the right show directory\n";
+    echo "\t subtitle \t\t\t - Download the best subtitle for the episodes, if available\n";
+    echo "\t check-orphan-lock \t - Check if a script is locked since a long time\n";
 }
 
 $commands = [
