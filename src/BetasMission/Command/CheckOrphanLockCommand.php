@@ -10,7 +10,7 @@ use DateTime;
 /**
  * Class CheckOrphanLockCommand
  */
-class CheckOrphanLockCommand extends AbstractCommand implements CommandInterface
+class CheckOrphanLockCommand extends AbstractCommand
 {
     /**
      * @return bool|int

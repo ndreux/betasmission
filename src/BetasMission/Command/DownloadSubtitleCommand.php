@@ -8,7 +8,7 @@ use stdClass;
 /**
  * Class DownloadSubtitleCommand
  */
-class DownloadSubtitleCommand extends AbstractCommand implements CommandInterface
+class DownloadSubtitleCommand extends AbstractCommand
 {
     const CONTEXT = Context::CONTEXT_DOWNLOAD_SUBTITLE;
     const FROM    = '/mnt/smb/Labox/Series/Actives/';

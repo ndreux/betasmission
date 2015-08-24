@@ -7,7 +7,7 @@ use BetasMission\Helper\Context;
 /**
  * Class RemoveWatchedCommand.
  */
-class RemoveWatchedCommand extends AbstractCommand implements CommandInterface
+class RemoveWatchedCommand extends AbstractCommand
 {
     const FROM    = '/mnt/smb/Labox/Series/Actives';
     const CONTEXT = Context::CONTEXT_REMOVE;
