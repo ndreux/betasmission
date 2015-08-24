@@ -15,7 +15,6 @@ use PHPUnit_Framework_TestCase;
 class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @return void
      */
     public function testExecuteNoOrphanLock()
     {
@@ -30,7 +29,6 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testExecuteOrphanLock()
     {

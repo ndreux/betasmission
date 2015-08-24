@@ -27,7 +27,7 @@ abstract class AbstractCommand
      *
      * @return mixed
      */
-    abstract function execute();
+    abstract public function execute();
 
     /**
      * Constructor

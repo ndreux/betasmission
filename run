@@ -2,7 +2,7 @@
 
 <?php
 
-use BetasMission\Command\CommandInterface;
+use BetasMission\Command\AbstractCommand;
 
 require __DIR__.'/vendor/autoload.php';
 
@@ -32,7 +32,7 @@ if (count($arguments) == 1 || (isset($arguments[1]) && !array_key_exists($argume
     return -1;
 }
 
-/** @var CommandInterface $command */
+/** @var AbstractCommand $command */
 $command = new $commands[$arguments[1]]();
 
 if (!$command->preExecute()) {
