@@ -4,7 +4,7 @@
 
 use BetasMission\Command\CommandInterface;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 /**
  * @return void
@@ -18,9 +18,10 @@ function usage()
 }
 
 $commands = [
-    'remove'   => 'BetasMission\Command\RemoveWatchedCommand',
-    'move'     => 'BetasMission\Command\MoveCommand',
-    'subtitle' => 'BetasMission\Command\DownloadSubtitleCommand'
+    'remove'            => 'BetasMission\Command\RemoveWatchedCommand',
+    'move'              => 'BetasMission\Command\MoveCommand',
+    'subtitle'          => 'BetasMission\Command\DownloadSubtitleCommand',
+    'check-orphan-lock' => 'BetasMission\Command\CheckOrphanLockCommand'
 ];
 
 $arguments = $argv;

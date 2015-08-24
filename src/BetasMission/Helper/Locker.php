@@ -50,7 +50,7 @@ class Locker
     /**
      * @return string
      */
-    private function getLockFile()
+    public function getLockFile()
     {
         if (!in_array($this->context, Context::getAvailableContexts())) {
             return self::LOCK_PATH.self::LOCK_FILE;
