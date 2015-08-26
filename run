@@ -2,9 +2,9 @@
 
 <?php
 
-use BetasMission\Command\CommandInterface;
+use BetasMission\Command\AbstractCommand;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 /**
  * @return void
@@ -12,15 +12,17 @@ require __DIR__ . '/vendor/autoload.php';
 function usage()
 {
     echo "Available commands : \n";
-    echo "\t remove \t - Delete all episodes marked as watched on betaseries\n";
-    echo "\t move \t\t - Move the downloaded files into the right show directory\n";
-    echo "\t subtitle \t - Download the best subtitle for the episodes, if available\n";
+    echo "\t remove \t\t\t - Delete all episodes marked as watched on betaseries\n";
+    echo "\t move \t\t\t\t - Move the downloaded files into the right show directory\n";
+    echo "\t subtitle \t\t\t - Download the best subtitle for the episodes, if available\n";
+    echo "\t check-orphan-lock \t - Check if a script is locked since a long time\n";
 }
 
 $commands = [
-    'remove'   => 'BetasMission\Command\RemoveWatchedCommand',
-    'move'     => 'BetasMission\Command\MoveCommand',
-    'subtitle' => 'BetasMission\Command\DownloadSubtitleCommand'
+    'remove'            => 'BetasMission\Command\RemoveWatchedCommand',
+    'move'              => 'BetasMission\Command\MoveCommand',
+    'subtitle'          => 'BetasMission\Command\DownloadSubtitleCommand',
+    'check-orphan-lock' => 'BetasMission\Command\CheckOrphanLockCommand'
 ];
 
 $arguments = $argv;
@@ -31,7 +33,7 @@ if (count($arguments) == 1 || (isset($arguments[1]) && !array_key_exists($argume
     return -1;
 }
 
-/** @var CommandInterface $command */
+/** @var AbstractCommand $command */
 $command = new $commands[$arguments[1]]();
 
 if (!$command->preExecute()) {

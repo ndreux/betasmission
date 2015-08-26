@@ -7,7 +7,7 @@ use BetasMission\Helper\Context;
 /**
  * Class MoveCommand.
  */
-class MoveCommand extends AbstractCommand implements CommandInterface
+class MoveCommand extends AbstractCommand
 {
     const FROM                = '/home/pi/Downloads/Complete';
     const DESTINATION         = '/mnt/smb/Labox/Series/Actives';

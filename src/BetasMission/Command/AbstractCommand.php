@@ -9,7 +9,7 @@ use BetasMission\Helper\Logger;
 /**
  * Class AbstractCommand.
  */
-class AbstractCommand
+abstract class AbstractCommand
 {
     const CONTEXT = null;
 
@@ -21,6 +21,13 @@ class AbstractCommand
 
     /** @var  Logger */
     protected $logger;
+
+    /**
+     * Execute
+     *
+     * @return mixed
+     */
+    abstract public function execute();
 
     /**
      * Constructor

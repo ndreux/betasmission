@@ -21,4 +21,4 @@ return Symfony\CS\Config\Config::create()
             ]
         )
     )
-    ->setUsingCache(true);
+    ->setUsingCache(false);
