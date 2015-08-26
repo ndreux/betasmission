@@ -9,6 +9,9 @@ COPY php.ini /usr/local/etc/php/php.ini
 
 VOLUME /home/pi/betasmission
 
+RUN mkdir -p /home/pi/Downloads/Complete
+RUN mkdir -p /home/pi/Downloads/Uncomplete
+
 EXPOSE 32775
 EXPOSE 80
 
