@@ -106,7 +106,6 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testSendAlert()
     {
@@ -133,7 +132,6 @@ class CheckOrphanLockCommandTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return void
      */
     public function testGetMailer()
     {

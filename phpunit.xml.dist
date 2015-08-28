@@ -15,4 +15,7 @@
         <log type="coverage-clover" target="./coverage.xml" />
     </logging>
 
+    <php>
+        <env name="env" value="DEV" />
+    </php>
 </phpunit>

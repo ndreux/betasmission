@@ -24,7 +24,9 @@ abstract class AbstractMessage
      */
     public function getMessage()
     {
-        return \Swift_Message::newInstance($this->getSubject())
+        $subject = '['.getenv('env').'] - '.$this->getSubject();
+
+        return \Swift_Message::newInstance($subject)
             ->setFrom($this->getFrom())
             ->setTo($this->getTo())
             ->setBody($this->getBody())
