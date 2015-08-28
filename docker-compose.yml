@@ -1,0 +1,6 @@
+raspbian:
+  build: build
+  volumes:
+    - ./:/home/pi/betasmission
+  ports:
+    - 9000:9000

@@ -2,8 +2,8 @@
 
 namespace BetasMission\Command;
 
+use BetasMission\CommandHelper\DownloadSubtitleCommandHelper;
 use BetasMission\Helper\Context;
-use stdClass;
 
 /**
  * Class DownloadSubtitleCommand
@@ -14,16 +14,36 @@ class DownloadSubtitleCommand extends AbstractCommand
     const FROM    = '/mnt/smb/Labox/Series/Actives/';
 
     /**
+     * @var string
+     */
+    private $from;
+
+    /**
+     * @var DownloadSubtitleCommandHelper
+     */
+    private $commandHelper;
+
+    /**
+     * @param string $from
+     */
+    public function __construct($from = self::FROM)
+    {
+        parent::__construct();
+        $this->from          = $from;
+        $this->commandHelper = new DownloadSubtitleCommandHelper();
+    }
+
+    /**
      */
     public function execute()
     {
-        $shows = array_diff(scandir(self::FROM), ['..', '.']);
+        $shows = array_diff(scandir($this->from), ['..', '.']);
 
         $this->logger->log(count($shows).' found');
 
         foreach ($shows as $show) {
             $this->logger->log('Show : '.$show);
-            $episodes = array_diff(scandir(self::FROM.'/'.$show), ['..', '.']);
+            $episodes = array_diff(scandir($this->from.'/'.$show), ['..', '.']);
 
             foreach ($episodes as $i => $episode) {
                 $this->logger->log($episode);
@@ -33,7 +53,7 @@ class DownloadSubtitleCommand extends AbstractCommand
                     sleep(20);
                 }
 
-                if ($this->episodeHasSubtitle(self::FROM.$show.'/'.$episode)) {
+                if ($this->commandHelper->episodeHasSubtitle($this->from.$show.'/'.$episode)) {
                     $this->logger->log('Episode already has a subtitle');
                     continue;
                 }
@@ -45,148 +65,19 @@ class DownloadSubtitleCommand extends AbstractCommand
                     continue;
                 }
 
-                $subtitle = $this->getBestSubtitle($episodeData->episode->id);
+                $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($episodeData->episode->id);
+                $this->logger->log(count($subtitles->subtitles).' found');
+
+                $subtitle = $this->commandHelper->getBestSubtitle($subtitles);
 
                 if ($subtitle === null) {
                     $this->logger->log('Subtitles not found on BetaSeries');
                     continue;
                 }
 
-                $this->applySubTitle(self::FROM.$show.'/'.$episode, $subtitle);
-            }
-        }
-    }
-
-    /**
-     * @param int $episodeId
-     *
-     * @throws \Exception
-     *
-     * @return null|stdClass
-     */
-    private function getBestSubtitle($episodeId)
-    {
-        $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($episodeId);
-
-        $this->logger->log(count($subtitles).' found');
-
-        /** @var stdClass|null $bestSubtitle */
-        $bestSubtitle = null;
-
-        foreach ($subtitles->subtitles as $subtitle) {
-            $filePathInfo = pathinfo($subtitle->file);
-
-            if ($filePathInfo['extension'] == 'zip') {
-                continue;
-            }
-
-            if ($bestSubtitle === null || $bestSubtitle->quality < $subtitle->quality) {
-                $bestSubtitle = $subtitle;
-            }
-        }
-
-        return $bestSubtitle;
-    }
-
-    /**
-     * @param string   $episode
-     * @param stdClass $subtitle
-     *
-     * @return bool
-     */
-    private function applySubTitle($episode, $subtitle)
-    {
-        $subtitleFilePath = $this->getSubtitleFilePath($subtitle->url, $subtitle->file);
-
-        if (is_dir($episode)) {
-            $files = array_diff(scandir($episode), ['..', '.']);
-
-            foreach ($files as $file) {
-                $filePathInfo = pathinfo($file);
-
-                if (!in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi'])) {
-                    continue;
-                }
-
-                $filePathInfo          = pathinfo($episode.'/'.$file);
-                $destination           = $filePathInfo['dirname'];
-                $episodeFileWithoutExt = $filePathInfo['filename'];
-
-                copy($subtitleFilePath, $destination.'/'.$episodeFileWithoutExt.'.srt');
-                unlink($subtitleFilePath);
-
+                $this->commandHelper->applySubTitle($this->from.$show.'/'.$episode, $subtitle);
                 $this->logger->log('Subtitle applied');
-
-                return true;
             }
-        } else {
-            $filePathInfo          = pathinfo($episode);
-            $destination           = $filePathInfo['dirname'];
-            $episodeFileWithoutExt = $filePathInfo['filename'];
-
-            copy($subtitleFilePath, $destination.'/'.$episodeFileWithoutExt.'.srt');
-            unlink($subtitleFilePath);
-
-            $this->logger->log('Subtitle applied');
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $subtitleUrl
-     * @param string $subtitleLabel
-     *
-     * @return string
-     */
-    private function getSubtitleFilePath($subtitleUrl, $subtitleLabel)
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $subtitleUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $data = curl_exec($ch);
-        curl_close($ch);
-
-        file_put_contents('/tmp/'.$subtitleLabel, $data);
-
-        $this->logger->log('Subtitle downloaded : '.$subtitleLabel);
-
-        return '/tmp/'.$subtitleLabel;
-    }
-
-    /**
-     * @param string $episode
-     *
-     * @return bool
-     */
-    private function episodeHasSubtitle($episode)
-    {
-        if (is_dir($episode)) {
-            $files = array_diff(scandir($episode), ['..', '.']);
-
-            foreach ($files as $file) {
-                $filePathInfo = pathinfo($file);
-
-                if (!in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi'])) {
-                    continue;
-                }
-
-                $episodePathInfo       = pathinfo($file);
-                $subtitleWithExtension = $episodePathInfo['filename'].'.srt';
-
-                return file_exists($episode.'/'.$subtitleWithExtension);
-            }
-        } else {
-            $episodePathInfo       = pathinfo($episode);
-            $subtitleWithExtension = $episodePathInfo['filename'].'.srt';
-
-            $episodeDirectory = $episodePathInfo['dirname'];
-
-            if (!in_array($episodePathInfo['extension'], ['mp4', 'mkv', 'avi'])) {
-                return true;
-            }
-
-            return file_exists($episodeDirectory.'/'.$subtitleWithExtension);
         }
     }
 }

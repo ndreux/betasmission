@@ -48,6 +48,14 @@ class CheckOrphanLockCommand extends AbstractCommand
      */
     public function sendAlert($tempFile, DateTime $sinceWhen)
     {
-        return (new Mailer())->send((new OrphanLockMessage($tempFile, $sinceWhen))->getMessage());
+        return $this->getMailer()->send((new OrphanLockMessage($tempFile, $sinceWhen))->getMessage());
+    }
+
+    /**
+     * @return Mailer
+     */
+    public function getMailer()
+    {
+        return new Mailer();
     }
 }
