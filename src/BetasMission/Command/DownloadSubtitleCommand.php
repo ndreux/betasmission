@@ -68,7 +68,7 @@ class DownloadSubtitleCommand extends AbstractCommand
                 $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($episodeData->episode->id);
                 $this->logger->log(count($subtitles->subtitles).' found');
 
-                $subtitle = $this->commandHelper->getBestSubtitle($subtitles);
+                $subtitle = $this->commandHelper->getBestSubtitle($subtitles, $episode);
 
                 if ($subtitle === null) {
                     $this->logger->log('Subtitles not found on BetaSeries');
