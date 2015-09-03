@@ -44,10 +44,10 @@ class DownloadSubtitleCommandHelper
             return false;
         } else {
             if (!$this->isVideo($episode)) {
-                return true;
+                return null;
             }
 
-            return file_exists($this->getSubtitleFileNameFromEpisode($episode, true));
+            return file_exists($this->getSubtitleFileNameFromEpisode($episode));
         }
     }
 
