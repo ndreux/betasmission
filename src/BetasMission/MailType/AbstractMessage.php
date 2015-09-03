@@ -24,9 +24,7 @@ abstract class AbstractMessage
      */
     public function getMessage()
     {
-        $subject = '['.getenv('env').'] - '.$this->getSubject();
-
-        return \Swift_Message::newInstance($subject)
+        return \Swift_Message::newInstance($this->getSubject())
             ->setFrom($this->getFrom())
             ->setTo($this->getTo())
             ->setBody($this->getBody())
@@ -38,7 +36,7 @@ abstract class AbstractMessage
      */
     protected function getFrom()
     {
-        return ['no-reply@labox-ndr.no-ip.org' => 'Raspberry Pi'];
+        return ['no-reply@labox-ndr.no-ip.org' => '['.getenv('env').'] - Raspberry Pi'];
     }
 
     /**

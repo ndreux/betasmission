@@ -9,6 +9,22 @@ use stdClass;
  */
 class DownloadSubtitleCommandHelper
 {
+    const SUBTITLE_EXTENSION = '.srt';
+
+    /**
+     * @return array
+     */
+    private static function getAvailableTeams()
+    {
+        return array_map(
+            'strtolower',
+            [
+                'KILLERS', 'ASAP', 'LOL', 'FoV', 'YIFY', 'IMMERSE', '0-sec', 'DIMENSION', 'fastsub', 'RIVER', 'tla',
+                'BATV', '2HD', 'FGT', 'QCF', 'DEFiNE', 'TASTETV', 'FQM', 'FEVER', '0TV', 'EVOLVE', 'SNEAkY',
+            ]
+        );
+    }
+
     /**
      * @param string $episode
      *
@@ -27,11 +43,11 @@ class DownloadSubtitleCommandHelper
 
             return false;
         } else {
-            if (!$this->isFileAVideo($episode)) {
+            if (!$this->isVideo($episode)) {
                 return false;
             }
 
-            return file_exists($this->getFileWithoutExtension($episode, true).'.srt');
+            return file_exists($this->getSubtitleFileNameFromEpisode($episode, true));
         }
     }
 
@@ -42,28 +58,25 @@ class DownloadSubtitleCommandHelper
      *
      * @return null|stdClass
      */
-    public function getBestSubtitle($subtitles)
+    public function getBestSubtitle($subtitles, $episodeName)
     {
-        if ($subtitles->subtitles === null) {
+        if (empty($subtitles->subtitles)) {
             return;
         }
 
-        /** @var stdClass|null $bestSubtitle */
-        $bestSubtitle = null;
+        $teamSubtitle = $this->getBestSubtitleByTeam($subtitles->subtitles, $episodeName);
 
-        foreach ($subtitles->subtitles as $subtitle) {
-            $filePathInfo = pathinfo($subtitle->file);
-
-            if ($filePathInfo['extension'] == 'zip') {
-                continue;
-            }
-
-            if ($bestSubtitle === null || $bestSubtitle->quality < $subtitle->quality) {
-                $bestSubtitle = $subtitle;
-            }
+        if ($teamSubtitle !== null) {
+            return $teamSubtitle;
         }
 
-        return $bestSubtitle;
+        $bestQualitySubtitle = $this->getBestSubtitleByQuality($subtitles->subtitles);
+
+        if ($bestQualitySubtitle !== null) {
+            return $bestQualitySubtitle;
+        }
+
+        return;
     }
 
     /**
@@ -80,17 +93,17 @@ class DownloadSubtitleCommandHelper
             $files = array_diff(scandir($episode), ['..', '.']);
 
             foreach ($files as $file) {
-                if (!$this->isFileAVideo($file)) {
+                if (!$this->isVideo($file)) {
                     continue;
                 }
 
-                copy($tempSubtitle, $this->getFileWithoutExtension($episode.'/'.$file).'.srt');
+                copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode.'/'.$file));
                 unlink($tempSubtitle);
 
                 return true;
             }
         } else {
-            copy($tempSubtitle, $this->getFileWithoutExtension($episode).'.srt');
+            copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode));
             unlink($tempSubtitle);
         }
 
@@ -121,7 +134,7 @@ class DownloadSubtitleCommandHelper
      *
      * @return bool
      */
-    private function isFileAVideo($file)
+    private function isVideo($file)
     {
         $filePathInfo = pathinfo($file);
 
@@ -131,12 +144,112 @@ class DownloadSubtitleCommandHelper
     /**
      * @param string $file
      *
+     * @return bool
+     */
+    private function isZip($file)
+    {
+        $filePathInfo = pathinfo($file);
+
+        return in_array($filePathInfo['extension'], ['zip']);
+    }
+
+    /**
+     * @param string $episode
+     *
      * @return string
      */
-    private function getFileWithoutExtension($file)
+    private function getSubtitleFileNameFromEpisode($episode)
     {
-        $episodePathInfo = pathinfo($file);
+        $episodePathInfo = pathinfo($episode);
 
-        return $episodePathInfo['dirname'].'/'.$episodePathInfo['filename'];
+        return $episodePathInfo['dirname'].'/'.$episodePathInfo['filename'].self::SUBTITLE_EXTENSION;
+    }
+
+    /**
+     * @param $text
+     *
+     * @return mixed|string
+     */
+    private function slugify($text)
+    {
+        $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+        $text = trim($text, '-');
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = strtolower($text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = str_replace('-', '.', $text);
+
+        return (empty($text)) ? null : $text;
+    }
+
+    /**
+     * @param stdClass[] $subtitles
+     * @param string     $episodeName
+     *
+     * @return null|stdClass
+     */
+    private function getBestSubtitleByTeam($subtitles, $episodeName)
+    {
+        $team = $this->getEpisodeTeam($episodeName);
+
+        if ($team === null) {
+            return;
+        }
+
+        foreach ($subtitles as $subtitle) {
+            // ToDo (ndreux - 2015-08-31) Manage zip
+            if ($this->isZip($subtitle->file)) {
+                continue;
+            }
+
+            if (strpos($this->slugify($subtitle->file), $team) !== false) {
+                return $subtitle;
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * @param string $episodeName
+     *
+     * @return null|string
+     */
+    private function getEpisodeTeam($episodeName)
+    {
+        $episodeInfo         = pathinfo($episodeName);
+        $explodedEpisodeName = explode('.', $this->slugify($episodeInfo['filename']));
+
+        foreach ($explodedEpisodeName as $episodeNamePart) {
+            if (in_array($episodeNamePart, self::getAvailableTeams())) {
+                return $episodeNamePart;
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * @param stdClass[] $subtitles
+     *
+     * @return null|stdClass
+     */
+    private function getBestSubtitleByQuality($subtitles)
+    {
+        /** @var stdClass|null $bestSubtitle */
+        $bestSubtitle = null;
+        foreach ($subtitles as $subtitle) {
+
+            // ToDo (ndreux - 2015-08-31) Manage zip
+            if ($this->isZip($subtitle->file)) {
+                continue;
+            }
+
+            if ($bestSubtitle === null || $bestSubtitle->quality < $subtitle->quality) {
+                $bestSubtitle = $subtitle;
+            }
+        }
+
+        return $bestSubtitle;
     }
 }
