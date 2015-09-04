@@ -164,6 +164,35 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider testIsVOSTFREpisodeFileDataProvider
+     *
+     * @param string $episode
+     * @param bool   $expected
+     */
+    public function testIsVOSTFREpisodeFile($episode, $expected)
+    {
+        $commandHelper = new DownloadSubtitleCommandHelper();
+        $isVOSTFR      = $commandHelper->isVOSTFREpisode($episode);
+
+        $this->assertEquals($expected, $isVOSTFR);
+    }
+
+    /**
+     * @return array
+     */
+    public function testIsVOSTFREpisodeFileDataProvider()
+    {
+        return [
+            ['/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4', false],
+            ['/tmp/betasmission/Suits/Suits.S01E01.VOSTFR.KILLERS/Suit.S01E01.VOSTFR.KILLERS.mp4', true],
+            ['/tmp/betasmission/Suits/Suits.S01E01.vostfr.KILLERS/Suit.S01E01.vostfr.KILLERS.mp4', true],
+            ['/tmp/betasmission/Suits/Suits.S01E01.vOstFr.KILLERS/Suit.S01E01.vOstFr.KILLERS.mp4', true],
+            ['/tmp/betasmission/Suits/Suits.S01E01.vOstFr.KILLERS', true],
+            ['/tmp/betasmission/Suits/Suits.S01E01.KILLERS', false],
+        ];
+    }
+
+    /**
      * @return string
      */
     private function getFakeSubtitle()

@@ -44,7 +44,7 @@ class DownloadSubtitleCommandHelper
             return false;
         } else {
             if (!$this->isVideo($episode)) {
-                return null;
+                return;
             }
 
             return file_exists($this->getSubtitleFileNameFromEpisode($episode));
@@ -108,6 +108,18 @@ class DownloadSubtitleCommandHelper
         }
 
         return true;
+    }
+
+    /**
+     * @param $episode
+     *
+     * @return bool|int
+     */
+    public function isVOSTFREpisode($episode)
+    {
+        $episodeInfo = pathinfo($episode);
+
+        return strpos($this->slugify($episodeInfo['filename']), 'vostfr') !== false;
     }
 
     /**

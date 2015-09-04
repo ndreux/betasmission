@@ -53,6 +53,12 @@ class DownloadSubtitleCommand extends AbstractCommand
                     sleep(20);
                 }
 
+                $isVOSTFR = $this->commandHelper->isVOSTFREpisode($this->from . $show . '/' . $episode);
+                if ($isVOSTFR) {
+                    $this->logger->log('VOSTFR Episode. Does not need subtitle');
+                    continue;
+                }
+
                 $hasSubtitle = $this->commandHelper->episodeHasSubtitle($this->from.$show.'/'.$episode);
                 if ($hasSubtitle === null || $hasSubtitle === true) {
                     $this->logger->log('Episode already has a subtitle');
