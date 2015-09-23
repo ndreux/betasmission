@@ -7,7 +7,7 @@ use stdClass;
 /**
  * Class DownloadSubtitleCommandHelper
  */
-class DownloadSubtitleCommandHelper
+class DownloadSubtitleCommandHelper extends AbstractCommandHelper
 {
     const SUBTITLE_EXTENSION = '.srt';
 

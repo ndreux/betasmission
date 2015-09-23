@@ -13,13 +13,19 @@ abstract class AbstractCommand
 {
     const CONTEXT = null;
 
-    /** @var  BetaseriesApiWrapper */
+    /**
+     * @var BetaseriesApiWrapper
+     */
     protected $apiWrapper;
 
-    /** @var Locker */
+    /**
+     * @var Locker
+     */
     protected $locker;
 
-    /** @var  Logger */
+    /**
+     * @var Logger
+     */
     protected $logger;
 
     /**
@@ -64,30 +70,5 @@ abstract class AbstractCommand
         $this->logger->log('Unlock');
 
         return $this->locker->unlock();
-    }
-
-    /**
-     * @param string $src
-     *
-     * @return bool
-     */
-    protected function recurseRmdir($src)
-    {
-        $dir = opendir($src);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src.'/'.$file)) {
-                    $this->recurseRmdir($src.'/'.$file);
-                } else {
-                    $this->logger->log('Remove : '.$src.'/'.$file);
-                    unlink($src.'/'.$file);
-                }
-            }
-        }
-        $this->logger->log('Remove : '.$src);
-        rmdir($src);
-        closedir($dir);
-
-        return true;
     }
 }
