@@ -49,7 +49,7 @@ class MoveCommand extends AbstractCommand
                 $destinationPath = self::DEFAULT_DESTINATION;
             }
 
-            if ($this->commandHelper->moveShow(self::FROM.'/'.$episode, $destinationPath) && isset($episodeData)) {
+            if (isset($episodeData) && $this->commandHelper->moveShow(self::FROM.'/'.$episode, $destinationPath)) {
                 $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
                 $this->logger->log('Marked the episode has downloaded');
             }
