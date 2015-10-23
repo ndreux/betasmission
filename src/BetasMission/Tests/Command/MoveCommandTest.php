@@ -53,4 +53,34 @@ class MoveCommandTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($return);
     }
+
+    public function testExecute()
+    {
+        mkdir(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        touch(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        touch(MoveCommand::FROM.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        touch(MoveCommand::FROM.'/Test.mkv');
+
+        $this->assertFileExists(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileExists(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileExists(MoveCommand::FROM.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileExists(MoveCommand::FROM.'/Test.mkv');
+
+        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Test.mkv');
+        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Test.mkv');
+
+        $command = new MoveCommand();
+        $command->execute();
+
+        unlink(MoveCommand::DEFAULT_DESTINATION.'/Test.mkv');
+        unlink(MoveCommand::DESTINATION.'/Awkward./Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        unlink(MoveCommand::DESTINATION.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        rmdir(MoveCommand::DESTINATION.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+    }
 }
