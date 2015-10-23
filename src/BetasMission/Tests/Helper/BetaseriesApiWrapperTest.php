@@ -50,11 +50,22 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
      * @expectedException Exception
      */
-    public function testMarkAsWatched()
+    public function testMarkAsWatchedFail()
     {
         $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
 
         $episodeId = 348990;
+        $apiWrapper->markAsWatched($episodeId);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testMarkAsWatched()
+    {
+        $apiWrapper = new BetaseriesApiWrapper(BetaseriesApiWrapper::LOGIN, BetaseriesApiWrapper::PASSWORD_HASH);
+
+        $episodeId = 203664;
         $apiWrapper->markAsWatched($episodeId);
     }
 
@@ -72,5 +83,37 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
         $result    = $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
 
         $this->assertInstanceOf('stdClass', $result);
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @expectedException Exception
+     * Note : Expect to fail because the episode id is unknown
+     * @return mixed
+     */
+    public function testGetSubtitleByEpisodeIdFail()
+    {
+        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+
+        $episodeId = 0;
+        $language  = 'all';
+        $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @expectedException Exception
+     * Note : Expect to fail because the login data are wrong
+     * @return mixed
+     */
+    public function testFailAuthenticate()
+    {
+        $apiWrapper = new BetaseriesApiWrapper('ndreux', md5('skldfhsdjklfhfjqlksfsdhf:qk'));
+
+        $episodeId = 0;
+        $language  = 'all';
+        $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
     }
 }
