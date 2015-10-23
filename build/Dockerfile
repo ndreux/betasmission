@@ -12,6 +12,8 @@ VOLUME /home/pi/betasmission
 RUN mkdir -p /home/pi/Downloads/Complete
 RUN mkdir -p /home/pi/Downloads/Uncomplete
 
+WORKDIR /home/pi
+
 EXPOSE 32775
 EXPOSE 80
 
