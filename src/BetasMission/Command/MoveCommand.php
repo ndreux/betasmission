@@ -3,6 +3,7 @@
 namespace BetasMission\Command;
 
 use BetasMission\Helper\Context;
+use Exception;
 
 /**
  * Class MoveCommand.
@@ -32,8 +33,12 @@ class MoveCommand extends AbstractCommand
             }
 
             if ($this->moveShow($episode, $destinationPath) && isset($episodeData)) {
-                $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
-                $this->logger->log('Marked the episode has downloaded');
+                try {
+                    $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
+                    $this->logger->log('Marked the episode has downloaded');
+                } catch (Exception $e) {
+                    $this->logger->log('The user does dot watch this show.');
+                }
             }
         }
     }
