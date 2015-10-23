@@ -2,6 +2,8 @@
 
 namespace BetasMission\CommandHelper;
 
+use BetasMission\Helper\Logger;
+
 /**
  * Class MoveCommandHelper
  */
@@ -9,33 +11,62 @@ class MoveCommandHelper extends AbstractCommandHelper
 {
 
     /**
-     * @param string $episode
-     * @param string $destinationPath
+     * @var string
+     */
+    private $from;
+
+    /**
+     * @var string
+     */
+    private $destination;
+
+    /**
+     * @var string
+     */
+    private $defaultDestination;
+
+    /**
+     * MoveCommandHelper constructor.
+     *
+     * @param string $from
+     * @param string $destination
+     * @param string $defaultDestination
+     */
+    public function __construct(Logger $logger, $from, $destination, $defaultDestination)
+    {
+        parent::__construct($logger);
+
+        $this->from               = $from;
+        $this->destination        = $destination;
+        $this->defaultDestination = $defaultDestination;
+    }
+
+    /**
+     * Move the given episode to its destination
+     *
+     * @param string $episode         Episode to move
+     * @param string $destinationPath Destination path
      *
      * @return bool
      */
-    public function moveShow($from, $destinationPath)
+    public function moveShow($episode, $destinationPath)
     {
-        if (is_file($from)) {
-            $this->logger->log('Moving '.$from.' to '.$destinationPath.'/'.$episode);
-            if (copy($from, $destinationPath.'/'.$episode)) {
-                $this->logger->log('Remove : '.$from);
-                unlink($from);
-            }
-        } else {
-            $this->recurseCopy($from, $destinationPath.'/'.$episode);
-            $this->recurseRmdir($from);
-        }
+        $from = $this->from.'/'.$episode;
+
+        $this->copy($from, $destinationPath.'/'.$episode);
+        $this->remove($from);
 
         return true;
     }
 
     /**
+     * Return the destination path of the given TV Show
+     *
      * @param string $showLabel
      *
      * @return string
      */
-    public function computeDestinationPath($showLabel)
+    public function getTVShowDestinationPath($showLabel)
     {
         if (!is_dir($this->destination.'/'.$showLabel)) {
             mkdir($this->destination.'/'.$showLabel, 0777, true);
@@ -47,48 +78,50 @@ class MoveCommandHelper extends AbstractCommandHelper
     /**
      * @param string $src
      * @param string $dst
-     *
-     * @return bool
      */
-    private function recurseCopy($src, $dst)
+    private function copy($src, $dst)
     {
-        $dir = opendir($src);
-        mkdir($dst);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src.'/'.$file)) {
-                    $this->recurseCopy($src.'/'.$file, $dst.'/'.$file);
-                } else {
-                    $this->logger->log('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
-                    copy($src.'/'.$file, $dst.'/'.$file);
+        if (is_file($src)) {
+            copy($src, $dst);
+        } else {
+            $dir = opendir($src);
+            mkdir($dst);
+            while (false !== ($file = readdir($dir))) {
+                if (($file != '.') && ($file != '..')) {
+                    if (is_dir($src.'/'.$file)) {
+                        $this->copy($src.'/'.$file, $dst.'/'.$file);
+                    } else {
+                        $this->logger->log('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
+                        copy($src.'/'.$file, $dst.'/'.$file);
+                    }
                 }
             }
+            closedir($dir);
         }
-        closedir($dir);
     }
 
     /**
      * @param string $src
-     *
-     * @return bool
      */
-    protected function recurseRmdir($src)
+    protected function remove($src)
     {
-        $dir = opendir($src);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src.'/'.$file)) {
-                    $this->recurseRmdir($src.'/'.$file);
-                } else {
-                    $this->logger->log('Remove : '.$src.'/'.$file);
-                    unlink($src.'/'.$file);
+        if (is_file($src)) {
+            unlink($src);
+        } else {
+            $dir = opendir($src);
+            while (false !== ($file = readdir($dir))) {
+                if (($file != '.') && ($file != '..')) {
+                    if (is_dir($src.'/'.$file)) {
+                        $this->remove($src.'/'.$file);
+                    } else {
+                        $this->logger->log('Remove : '.$src.'/'.$file);
+                        unlink($src.'/'.$file);
+                    }
                 }
             }
+            $this->logger->log('Remove : '.$src);
+            rmdir($src);
+            closedir($dir);
         }
-        $this->logger->log('Remove : '.$src);
-        rmdir($src);
-        closedir($dir);
-
-        return true;
     }
 }

@@ -4,6 +4,7 @@ namespace BetasMission\Command;
 
 use BetasMission\CommandHelper\MoveCommandHelper;
 use BetasMission\Helper\Context;
+use Exception;
 
 /**
  * Class MoveCommand.
@@ -43,15 +44,19 @@ class MoveCommand extends AbstractCommand
 
             try {
                 $episodeData     = $this->apiWrapper->getEpisodeData($episode);
-                $destinationPath = $this->commandHelper->computeDestinationPath($episodeData->episode->show->title);
+                $destinationPath = $this->commandHelper->getTVShowDestinationPath($episodeData->episode->show->title);
             } catch (\Exception $e) {
                 $this->logger->log('The episode has not been found.');
                 $destinationPath = self::DEFAULT_DESTINATION;
             }
 
-            if (isset($episodeData) && $this->commandHelper->moveShow(self::FROM.'/'.$episode, $destinationPath)) {
-                $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
-                $this->logger->log('Marked the episode has downloaded');
+            if ($this->commandHelper->moveShow($episode, $destinationPath) && isset($episodeData)) {
+                try {
+                    $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
+                    $this->logger->log('Marked the episode has downloaded');
+                } catch (Exception $e) {
+                    $this->logger->log('The user does dot watch this show.');
+                }
             }
         }
     }

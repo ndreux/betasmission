@@ -9,7 +9,6 @@ use BetasMission\Helper\Logger;
  */
 class AbstractCommandHelper
 {
-
     /**
      * @var Logger
      */
