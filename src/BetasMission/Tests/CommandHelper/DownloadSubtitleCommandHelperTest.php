@@ -3,6 +3,8 @@
 namespace src\BetasMission\Test\CommandHelper;
 
 use BetasMission\CommandHelper\DownloadSubtitleCommandHelper;
+use BetasMission\Helper\Context;
+use BetasMission\Helper\Logger;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -18,7 +20,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
         touch('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
         touch('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.srt');
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $result        = $commandHelper->episodeHasSubtitle('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
 
         unlink('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
@@ -35,7 +37,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
         mkdir('/tmp/betasmission/Suits/', 0777, true);
         touch('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $result        = $commandHelper->episodeHasSubtitle('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
 
         unlink('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4');
@@ -46,13 +48,29 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
 
     /**
      */
+    public function testEpisodeHasSubtitleNoVideoFile()
+    {
+        mkdir('/tmp/betasmission/Suits/', 0777, true);
+        touch('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.nfo');
+
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
+        $result        = $commandHelper->episodeHasSubtitle('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.nfo');
+
+        unlink('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.nfo');
+        rmdir('/tmp/betasmission/Suits');
+
+        $this->assertNull($result);
+    }
+
+    /**
+     */
     public function testEpisodeHasSubtitleDirectory()
     {
         mkdir('/tmp/betasmission/Suits/Suits.S01E01.KILLERS', 0777, true);
         touch('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
         touch('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.srt');
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $result        = $commandHelper->episodeHasSubtitle('/tmp/betasmission/Suits/Suits.S01E01.KILLERS');
 
         unlink('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
@@ -70,7 +88,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
         mkdir('/tmp/betasmission/Suits/Suits.S01E01.KILLERS', 0777, true);
         touch('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $result        = $commandHelper->episodeHasSubtitle('/tmp/betasmission/Suits/Suits.S01E01.KILLERS');
 
         unlink('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
@@ -90,8 +108,8 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
     {
         $subtitles = json_decode($jsonSubtitles);
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
-        $subtitle = $commandHelper->getBestSubtitle($subtitles, '/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
+        $subtitle      = $commandHelper->getBestSubtitle($subtitles, '/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
 
         $this->assertEquals($expected, $subtitle->id);
     }
@@ -103,8 +121,21 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
     {
         $subtitles = json_decode($this->getFakeSubtitleList4());
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
-        $subtitle = $commandHelper->getBestSubtitle($subtitles, '/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
+        $subtitle      = $commandHelper->getBestSubtitle($subtitles, '/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
+
+        $this->assertEquals(null, $subtitle);
+    }
+
+    /**
+     *
+     */
+    public function testGetBestSubtitleWithNoProcessableSubtitle()
+    {
+        $subtitles = json_decode($this->getFakeSubtitleList6());
+
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
+        $subtitle      = $commandHelper->getBestSubtitle($subtitles, '/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
 
         $this->assertEquals(null, $subtitle);
     }
@@ -132,7 +163,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
         $subtitle = json_decode($this->getFakeSubtitle());
         $episode  = '/tmp/betasmission/Suits/Suit.S01E01.KILLERS.mp4';
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $commandHelper->applySubTitle($episode, $subtitle);
 
         $this->assertFileExists('/tmp/betasmission/Suits/Suit.S01E01.KILLERS.srt');
@@ -152,7 +183,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
         $subtitle = json_decode($this->getFakeSubtitle());
         $episode  = '/tmp/betasmission/Suits/Suits.S01E01.KILLERS';
 
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $commandHelper->applySubTitle($episode, $subtitle);
 
         $this->assertFileExists('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.srt');
@@ -171,7 +202,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
      */
     public function testIsVOSTFREpisodeFile($episode, $expected)
     {
-        $commandHelper = new DownloadSubtitleCommandHelper();
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
         $isVOSTFR      = $commandHelper->isVOSTFREpisode($episode);
 
         $this->assertEquals($expected, $isVOSTFR);
@@ -604,6 +635,34 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
     {
         return '{
             "subtitles": [],
+            "errors": []
+        }';
+    }
+
+    /**
+     * @return string
+     */
+    private function getFakeSubtitleList6()
+    {
+        return '{
+            "subtitles": [
+                {
+                    "id": 449935,
+                    "language": "VO",
+                    "source": "addic7ed",
+                    "quality": 3,
+                    "file": "Suits - 01x01 - Pilot.720p.KILLERS.English.C.orig.Addic7ed.com.zip",
+                    "content": [],
+                    "url": "https:\/\/www.betaseries.com\/srt\/449935",
+                    "episode": {
+                        "show_id": 3286,
+                        "episode_id": 203664,
+                        "season": 1,
+                        "episode": 1
+                    },
+                    "date": "2014-04-22 20:08:08"
+                }
+            ],
             "errors": []
         }';
     }

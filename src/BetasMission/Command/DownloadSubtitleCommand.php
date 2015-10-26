@@ -30,7 +30,7 @@ class DownloadSubtitleCommand extends AbstractCommand
     {
         parent::__construct();
         $this->from          = $from;
-        $this->commandHelper = new DownloadSubtitleCommandHelper();
+        $this->commandHelper = new DownloadSubtitleCommandHelper($this->logger);
     }
 
     /**

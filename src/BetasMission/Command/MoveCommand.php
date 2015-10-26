@@ -2,6 +2,7 @@
 
 namespace BetasMission\Command;
 
+use BetasMission\CommandHelper\MoveCommandHelper;
 use BetasMission\Helper\Context;
 use Exception;
 
@@ -17,22 +18,39 @@ class MoveCommand extends AbstractCommand
     const CONTEXT = Context::CONTEXT_MOVE;
 
     /**
+     * @var MoveCommandHelper
+     */
+    private $commandHelper;
+
+    /**
+     * MoveCommand constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->commandHelper = new MoveCommandHelper($this->logger, self::FROM, self::DESTINATION, self::DEFAULT_DESTINATION);
+    }
+
+    /**
+     * MoveCommand Execute.
      */
     public function execute()
     {
         $episodes = array_diff(scandir(self::FROM), ['..', '.']);
 
         foreach ($episodes as $episode) {
+
             $this->logger->log('File : '.$episode);
+
             try {
                 $episodeData     = $this->apiWrapper->getEpisodeData($episode);
-                $destinationPath = $this->computeDestinationPath($episodeData->episode->show->title);
+                $destinationPath = $this->commandHelper->getTVShowDestinationPath($episodeData->episode->show->title);
             } catch (\Exception $e) {
                 $this->logger->log('The episode has not been found.');
                 $destinationPath = self::DEFAULT_DESTINATION;
             }
 
-            if ($this->moveShow($episode, $destinationPath) && isset($episodeData)) {
+            if ($this->commandHelper->moveShow($episode, $destinationPath) && isset($episodeData)) {
                 try {
                     $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
                     $this->logger->log('Marked the episode has downloaded');
@@ -41,66 +59,5 @@ class MoveCommand extends AbstractCommand
                 }
             }
         }
-    }
-
-    /**
-     * @param string $showLabel
-     *
-     * @return string
-     */
-    private function computeDestinationPath($showLabel)
-    {
-        if (!is_dir(self::DESTINATION.'/'.$showLabel)) {
-            mkdir(self::DESTINATION.'/'.$showLabel, 0777, true);
-        }
-
-        return self::DESTINATION.'/'.$showLabel;
-    }
-
-    /**
-     * @param string $episode
-     * @param string $destinationPath
-     *
-     * @return bool
-     */
-    private function moveShow($episode, $destinationPath)
-    {
-        $from = self::FROM.'/'.$episode;
-
-        if (is_file($from)) {
-            $this->logger->log('Moving '.$from.' to '.$destinationPath.'/'.$episode);
-            if (copy($from, $destinationPath.'/'.$episode)) {
-                $this->logger->log('Remove : '.$from);
-                unlink($from);
-            }
-        } else {
-            $this->recurseCopy($from, $destinationPath.'/'.$episode);
-            $this->recurseRmdir($from);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $src
-     * @param string $dst
-     *
-     * @return bool
-     */
-    private function recurseCopy($src, $dst)
-    {
-        $dir = opendir($src);
-        mkdir($dst);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src.'/'.$file)) {
-                    $this->recurseCopy($src.'/'.$file, $dst.'/'.$file);
-                } else {
-                    $this->logger->log('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
-                    copy($src.'/'.$file, $dst.'/'.$file);
-                }
-            }
-        }
-        closedir($dir);
     }
 }
