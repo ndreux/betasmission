@@ -2,6 +2,7 @@
 
 namespace BetasMission\CommandHelper;
 
+use BetasMission\Business\FileManagementBusiness;
 use BetasMission\Helper\Logger;
 
 /**
@@ -26,6 +27,11 @@ class MoveCommandHelper extends AbstractCommandHelper
     private $defaultDestination;
 
     /**
+     * @var FileManagementBusiness
+     */
+    private $fileManagementBusiness;
+
+    /**
      * MoveCommandHelper constructor.
      *
      * @param string $from
@@ -35,6 +41,7 @@ class MoveCommandHelper extends AbstractCommandHelper
     public function __construct(Logger $logger, $from, $destination, $defaultDestination)
     {
         parent::__construct($logger);
+        $this->fileManagementBusiness = new FileManagementBusiness($logger);
 
         $this->from               = $from;
         $this->destination        = $destination;
@@ -53,8 +60,8 @@ class MoveCommandHelper extends AbstractCommandHelper
     {
         $from = $this->from.'/'.$episode;
 
-        $this->copy($from, $destinationPath.'/'.$episode);
-        $this->remove($from);
+        $this->fileManagementBusiness->copy($from, $destinationPath.'/'.$episode);
+        $this->fileManagementBusiness->remove($from);
 
         return true;
     }
@@ -73,55 +80,5 @@ class MoveCommandHelper extends AbstractCommandHelper
         }
 
         return $this->destination.'/'.$showLabel;
-    }
-
-    /**
-     * @param string $src
-     * @param string $dst
-     */
-    private function copy($src, $dst)
-    {
-        if (is_file($src)) {
-            copy($src, $dst);
-        } else {
-            $dir = opendir($src);
-            mkdir($dst);
-            while (false !== ($file = readdir($dir))) {
-                if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src.'/'.$file)) {
-                        $this->copy($src.'/'.$file, $dst.'/'.$file);
-                    } else {
-                        $this->logger->log('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
-                        copy($src.'/'.$file, $dst.'/'.$file);
-                    }
-                }
-            }
-            closedir($dir);
-        }
-    }
-
-    /**
-     * @param string $src
-     */
-    protected function remove($src)
-    {
-        if (is_file($src)) {
-            unlink($src);
-        } else {
-            $dir = opendir($src);
-            while (false !== ($file = readdir($dir))) {
-                if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src.'/'.$file)) {
-                        $this->remove($src.'/'.$file);
-                    } else {
-                        $this->logger->log('Remove : '.$src.'/'.$file);
-                        unlink($src.'/'.$file);
-                    }
-                }
-            }
-            $this->logger->log('Remove : '.$src);
-            rmdir($src);
-            closedir($dir);
-        }
     }
 }

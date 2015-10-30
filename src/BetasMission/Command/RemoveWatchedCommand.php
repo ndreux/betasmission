@@ -2,6 +2,7 @@
 
 namespace BetasMission\Command;
 
+use BetasMission\CommandHelper\RemoveCommandHelper;
 use BetasMission\Helper\Context;
 
 /**
@@ -13,27 +14,43 @@ class RemoveWatchedCommand extends AbstractCommand
     const CONTEXT = Context::CONTEXT_REMOVE;
 
     /**
+     * @var RemoveCommandHelper
+     */
+    private $commandActionHelper;
+
+    /**
+     * @var string
+     */
+    private $from;
+
+    /**
+     * RemoveWatchedCommand constructor.
+     *
+     * @param string $from
+     */
+    public function __construct($from = self::FROM)
+    {
+        parent::__construct();
+
+        $this->from                = $from;
+        $this->commandActionHelper = new RemoveCommandHelper($this->logger);
+    }
+
+    /**
      * Execute
      */
     public function execute()
     {
-        $this->logger->log('Lock');
-        $this->locker->lock();
-
-        $shows = array_diff(scandir(self::FROM), ['..', '.']);
+        $shows = array_diff(scandir($this->from), ['..', '.']);
 
         $this->logger->log(count($shows).' found');
 
         foreach ($shows as $show) {
             $this->logger->log('Show : '.$show);
-            $episodes = array_diff(scandir(self::FROM.'/'.$show), ['..', '.']);
+            $episodes = array_diff(scandir($this->from.'/'.$show), ['..', '.']);
 
             foreach ($episodes as $i => $episode) {
                 $this->logger->log($episode);
-                if ($i % 30 == 0) {
-                    $this->logger->log('Wait 20s');
-                    sleep(20);
-                }
 
                 try {
                     $episodeData = $this->apiWrapper->getEpisodeData($episode);
@@ -44,12 +61,7 @@ class RemoveWatchedCommand extends AbstractCommand
 
                 $this->logger->log('Episode seen : '.($episodeData->episode->user->seen ? 'true' : 'false'));
                 if ($episodeData->episode->user->seen) {
-                    if (!is_dir(self::FROM.'/'.$show.'/'.$episode)) {
-                        $this->logger->log('Remove : '.self::FROM.'/'.$show.'/'.$episode);
-                        unlink(self::FROM.'/'.$show.'/'.$episode);
-                    } else {
-                        $this->recurseRmdir(self::FROM.'/'.$show.'/'.$episode);
-                    }
+                    $this->commandActionHelper->remove($this->from.'/'.$show.'/'.$episode);
                 }
             }
         }
