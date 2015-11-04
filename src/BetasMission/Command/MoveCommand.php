@@ -18,17 +18,40 @@ class MoveCommand extends AbstractCommand
     const CONTEXT = Context::CONTEXT_MOVE;
 
     /**
+     * @var string
+     */
+    private $from;
+
+    /**
+     * @var string
+     */
+    private $destination;
+
+    /**
+     * @var string
+     */
+    private $defaultDestination;
+
+    /**
      * @var MoveCommandHelper
      */
     private $commandHelper;
 
     /**
      * MoveCommand constructor.
+     *
+     * @param string $from
+     * @param string $destination
+     * @param string $defaultDestination
      */
-    public function __construct()
+    public function __construct($from = self::FROM, $destination = self::DESTINATION, $defaultDestination = self::DEFAULT_DESTINATION)
     {
         parent::__construct();
-        $this->commandHelper = new MoveCommandHelper($this->logger, self::FROM, self::DESTINATION, self::DEFAULT_DESTINATION);
+        $this->from               = $from;
+        $this->destination        = $destination;
+        $this->defaultDestination = $defaultDestination;
+
+        $this->commandHelper = new MoveCommandHelper($this->logger, $this->from, $this->destination, $this->defaultDestination);
     }
 
     /**
@@ -36,7 +59,7 @@ class MoveCommand extends AbstractCommand
      */
     public function execute()
     {
-        $episodes = array_diff(scandir(self::FROM), ['..', '.']);
+        $episodes = array_diff(scandir($this->from), ['..', '.']);
 
         foreach ($episodes as $episode) {
 
@@ -47,7 +70,7 @@ class MoveCommand extends AbstractCommand
                 $destinationPath = $this->commandHelper->getTVShowDestinationPath($episodeData->episode->show->title);
             } catch (\Exception $e) {
                 $this->logger->log('The episode has not been found.');
-                $destinationPath = self::DEFAULT_DESTINATION;
+                $destinationPath = $this->defaultDestination;
             }
 
             if ($this->commandHelper->moveShow($episode, $destinationPath) && isset($episodeData)) {

@@ -2,7 +2,6 @@
 
 namespace src\BetasMission\Tests\CommandHelper;
 
-use BetasMission\Command\MoveCommand;
 use BetasMission\CommandHelper\MoveCommandHelper;
 use BetasMission\Helper\Context;
 use BetasMission\Helper\Logger;
@@ -39,11 +38,14 @@ class MoveCommandHelperTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->logger             = new Logger(Context::CONTEXT_MOVE);
-        $this->from               = MoveCommand::FROM;
-        $this->destination        = '/tmp/betasmission';
-        $this->defaultDestination = '/tmp/betasmission';
 
-        mkdir('/tmp/betasmission');
+        $this->from               = '/tmp/betasmission/from';
+        $this->destination        = '/tmp/betasmission/destination';
+        $this->defaultDestination = '/tmp/betasmission/defaultDestination';
+
+        mkdir($this->from, 0777, true);
+        mkdir($this->destination, 0777, true);
+        mkdir($this->defaultDestination, 0777, true);
     }
 
     /**
@@ -52,6 +54,10 @@ class MoveCommandHelperTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         parent::tearDown();
+        rmdir($this->from);
+        rmdir($this->destination);
+        rmdir($this->defaultDestination);
+
         rmdir('/tmp/betasmission');
     }
 

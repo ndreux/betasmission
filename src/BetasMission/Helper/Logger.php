@@ -36,6 +36,10 @@ class Logger
      */
     public function log($message)
     {
+        if ($this->isTestEnv()) {
+            return 0;
+        }
+
         $now = new DateTime();
         $log = $now->format('Y-m-d H:i:s').' - '.$message."\n";
 
@@ -54,5 +58,13 @@ class Logger
         }
 
         return self::LOG_PATH.$logfile.$this->context.'.log';
+    }
+
+    /**
+     * @return bool
+     */
+    private function isTestEnv()
+    {
+        return getenv('env') == 'TEST';
     }
 }

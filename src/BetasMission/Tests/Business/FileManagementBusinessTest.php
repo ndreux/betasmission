@@ -22,7 +22,15 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->logger = new Logger();
-        mkdir('/tmp/betasmission');
+        mkdir('/tmp/betasmission', 0777, true);
+    }
+
+    /**
+     * @return void
+     */
+    public function tearDown()
+    {
+        rmdir('/tmp/betasmission');
     }
 
     /**
@@ -117,13 +125,5 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         $this->assertFileNotExists('/tmp/betasmission/test/test2');
         $this->assertFileNotExists('/tmp/betasmission/test/titi.mp4');
         $this->assertFileNotExists('/tmp/betasmission/test');
-    }
-
-    /**
-     * @return void
-     */
-    public function tearDown()
-    {
-        rmdir('/tmp/betasmission');
     }
 }
