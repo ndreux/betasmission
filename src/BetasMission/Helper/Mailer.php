@@ -18,7 +18,7 @@ class Mailer
     public function send(Swift_Mime_SimpleMimeEntity $message)
     {
         if ($this->isTestEnv()) {
-            return 0;
+            return 1;
         }
         return $this->getSwiftMailerInstance()->send($message);
     }
