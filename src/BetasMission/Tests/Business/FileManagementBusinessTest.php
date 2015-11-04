@@ -28,6 +28,14 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
     /**
      * @return void
      */
+    public function tearDown()
+    {
+        rmdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
     public function testCopyFile()
     {
         $business = new FileManagementBusiness($this->logger);
@@ -117,13 +125,5 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         $this->assertFileNotExists('/tmp/betasmission/test/test2');
         $this->assertFileNotExists('/tmp/betasmission/test/titi.mp4');
         $this->assertFileNotExists('/tmp/betasmission/test');
-    }
-
-    /**
-     * @return void
-     */
-    public function tearDown()
-    {
-        rmdir('/tmp/betasmission');
     }
 }

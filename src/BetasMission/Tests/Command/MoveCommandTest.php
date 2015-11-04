@@ -13,12 +13,33 @@ use PHPUnit_Framework_TestCase;
 class MoveCommandTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @var string
+     */
+    private $from;
+
+    /**
+     * @var string
+     */
+    private $destination;
+
+    /**
+     * @var string
+     */
+    private $defaultDestination;
+
+    /**
      * @return void
      */
     protected function setUp()
     {
         parent::setUp();
-        mkdir('/tmp/betasmission', 0777, true);
+        $this->from               = '/tmp/betasmission/from';
+        $this->destination        = '/tmp/betasmission/destination';
+        $this->defaultDestination = '/tmp/betasmission/defaultDestination';
+
+        mkdir($this->from, 0777, true);
+        mkdir($this->destination, 0777, true);
+        mkdir($this->defaultDestination, 0777, true);
     }
 
     /**
@@ -27,6 +48,11 @@ class MoveCommandTest extends PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         parent::tearDown();
+
+        rmdir($this->from);
+        rmdir($this->destination);
+        rmdir($this->defaultDestination);
+
         rmdir('/tmp/betasmission');
     }
 
@@ -74,31 +100,37 @@ class MoveCommandTest extends PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        mkdir(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
-        touch(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
-        touch(MoveCommand::FROM.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
-        touch(MoveCommand::FROM.'/Test.mkv');
+        mkdir($this->from.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        touch($this->from.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        touch($this->from.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        touch($this->from.'/Test.mkv');
 
-        $this->assertFileExists(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
-        $this->assertFileExists(MoveCommand::FROM.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
-        $this->assertFileExists(MoveCommand::FROM.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
-        $this->assertFileExists(MoveCommand::FROM.'/Test.mkv');
+        $this->assertFileExists($this->from.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileExists($this->from.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileExists($this->from.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileExists($this->from.'/Test.mkv');
 
-        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
-        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
-        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
-        $this->assertFileNotExists(MoveCommand::DESTINATION.'/Test.mkv');
-        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
-        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
-        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
-        $this->assertFileNotExists(MoveCommand::DEFAULT_DESTINATION.'/Test.mkv');
+        $this->assertFileNotExists($this->destination.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileNotExists($this->destination.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileNotExists($this->destination.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileNotExists($this->destination.'/Test.mkv');
+        $this->assertFileNotExists($this->defaultDestination.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileNotExists($this->defaultDestination.'/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileNotExists($this->defaultDestination.'/Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        $this->assertFileNotExists($this->defaultDestination.'/Test.mkv');
 
-        $command = new MoveCommand();
+        $command = new MoveCommand($this->from, $this->destination, $this->defaultDestination);
         $command->execute();
 
-        unlink(MoveCommand::DEFAULT_DESTINATION.'/Test.mkv');
-        unlink(MoveCommand::DESTINATION.'/Awkward./Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
-        unlink(MoveCommand::DESTINATION.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
-        rmdir(MoveCommand::DESTINATION.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        $this->assertFileExists($this->defaultDestination.'/Test.mkv');
+        $this->assertFileExists($this->destination.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        $this->assertFileExists($this->destination.'/Awkward./Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+
+        unlink($this->defaultDestination.'/Test.mkv');
+        unlink($this->destination.'/Awkward./Awkward.S05E07.720p.HDTV.x264-FLEET[rarbg].mp4');
+        rmdir($this->destination.'/Awkward.');
+        unlink($this->destination.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]/Suits.S05E10.HDTV.x264-ASAP[rarbg].mp4');
+        rmdir($this->destination.'/Suits/Suits.S05E10.HDTV.x264-ASAP[rarbg]');
+        rmdir($this->destination.'/Suits');
     }
 }
