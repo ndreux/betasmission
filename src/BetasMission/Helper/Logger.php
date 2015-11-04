@@ -36,7 +36,7 @@ class Logger
      */
     public function log($message)
     {
-        if (!$this->isTestEnv()) {
+        if ($this->isTestEnv()) {
             return 0;
         }
 
