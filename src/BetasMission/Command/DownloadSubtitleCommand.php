@@ -48,11 +48,6 @@ class DownloadSubtitleCommand extends AbstractCommand
             foreach ($episodes as $i => $episode) {
                 $this->logger->log($episode);
 
-                if ($i % 30 == 0) {
-                    $this->logger->log('Wait 20s');
-                    sleep(20);
-                }
-
                 $isVOSTFR = $this->commandHelper->isVOSTFREpisode($this->from . $show . '/' . $episode);
                 if ($isVOSTFR) {
                     $this->logger->log('VOSTFR Episode. Does not need subtitle');

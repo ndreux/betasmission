@@ -13,6 +13,24 @@ use PHPUnit_Framework_TestCase;
  */
 class MailerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        mkdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        rmdir('/tmp/betasmission');
+    }
+
     public function testSendOrphanLockMessage()
     {
         $mailer = new Mailer();

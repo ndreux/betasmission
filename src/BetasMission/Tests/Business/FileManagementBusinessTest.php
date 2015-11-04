@@ -16,11 +16,18 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
      */
     private $logger;
 
+    /**
+     * @return void
+     */
     public function setUp()
     {
         $this->logger = new Logger();
+        mkdir('/tmp/betasmission');
     }
 
+    /**
+     * @return void
+     */
     public function testCopyFile()
     {
         $business = new FileManagementBusiness($this->logger);
@@ -39,6 +46,9 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         unlink('/tmp/toto.mp4');
     }
 
+    /**
+     * @return void
+     */
     public function testCopyDir()
     {
         $business = new FileManagementBusiness($this->logger);
@@ -60,6 +70,9 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         rmdir('/tmp/test');
     }
 
+    /**
+     * @return void
+     */
     public function testCopyDirRecursive()
     {
         $business = new FileManagementBusiness($this->logger);
@@ -84,6 +97,9 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         rmdir('/tmp/test');
     }
 
+    /**
+     * @return void
+     */
     public function testRemove()
     {
         $business = new FileManagementBusiness($this->logger);
@@ -101,5 +117,13 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
         $this->assertFileNotExists('/tmp/betasmission/test/test2');
         $this->assertFileNotExists('/tmp/betasmission/test/titi.mp4');
         $this->assertFileNotExists('/tmp/betasmission/test');
+    }
+
+    /**
+     * @return void
+     */
+    public function tearDown()
+    {
+        rmdir('/tmp/betasmission');
     }
 }
