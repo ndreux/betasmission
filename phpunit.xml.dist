@@ -18,4 +18,14 @@
     <php>
         <env name="env" value="DEV" />
     </php>
+
+    <filter>
+       <whitelist addUncoveredFilesFromWhitelist="true">
+           <directory>./src/</directory>
+           <exclude>
+            <directory suffix=".php">./vendor/</directory>
+            <directory suffix=".php">./src/BetasMission/Tests/</directory>
+        </exclude>
+       </whitelist>
+   </filter>
 </phpunit>
