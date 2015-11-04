@@ -11,6 +11,27 @@ use PHPUnit_Framework_TestCase;
 class RemoveWatchedCommandTest extends PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+        mkdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        rmdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
     public function testExecute()
     {
         $from = '/tmp/betasmission/from';

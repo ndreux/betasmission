@@ -1,6 +1,4 @@
 raspbian:
-  build: build
+  image: ndreux/betasmission
   volumes:
     - ./:/home/pi/betasmission
-  ports:
-    - 9000:9000

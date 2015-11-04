@@ -17,5 +17,5 @@ WORKDIR /home/pi
 EXPOSE 32775
 EXPOSE 80
 
-CMD [ "tail", "-f", "/dev/null"]
+CMD tail -f /dev/null
 

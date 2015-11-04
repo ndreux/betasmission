@@ -13,6 +13,24 @@ use PHPUnit_Framework_TestCase;
 class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * @return void
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        mkdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        rmdir('/tmp/betasmission');
+    }
+
+    /**
      */
     public function testEpisodeHasSubtitleFile()
     {
@@ -179,6 +197,7 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
     {
         mkdir('/tmp/betasmission/Suits/Suits.S01E01.KILLERS', 0777, true);
         touch('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
+        touch('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.jpeg');
 
         $subtitle = json_decode($this->getFakeSubtitle());
         $episode  = '/tmp/betasmission/Suits/Suits.S01E01.KILLERS';
@@ -190,7 +209,28 @@ class DownloadSubtitleCommandHelperTest extends PHPUnit_Framework_TestCase
 
         unlink('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.mp4');
         unlink('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.srt');
+        unlink('/tmp/betasmission/Suits/Suits.S01E01.KILLERS/Suit.S01E01.KILLERS.jpeg');
         rmdir('/tmp/betasmission/Suits/Suits.S01E01.KILLERS');
+        rmdir('/tmp/betasmission/Suits');
+    }
+
+    /**
+     */
+    public function testApplySubtitleOnDirectoryWithNoVideoFiles()
+    {
+        mkdir('/tmp/betasmission/Suits/Suits.S01E02.KILLERS', 0777, true);
+        touch('/tmp/betasmission/Suits/Suits.S01E02.KILLERS/Suit.S01E02.KILLERS.jpeg');
+
+        $subtitle = json_decode($this->getFakeSubtitle());
+        $episode  = '/tmp/betasmission/Suits/Suits.S01E02.KILLERS';
+
+        $commandHelper = new DownloadSubtitleCommandHelper(new Logger(Context::CONTEXT_DOWNLOAD_SUBTITLE));
+        $commandHelper->applySubTitle($episode, $subtitle);
+
+        $this->assertFileNotExists('/tmp/betasmission/Suits/Suits.S01E02.KILLERS/Suit.S01E02.KILLERS.srt');
+
+        unlink('/tmp/betasmission/Suits/Suits.S01E02.KILLERS/Suit.S01E02.KILLERS.jpeg');
+        rmdir('/tmp/betasmission/Suits/Suits.S01E02.KILLERS');
         rmdir('/tmp/betasmission/Suits');
     }
 

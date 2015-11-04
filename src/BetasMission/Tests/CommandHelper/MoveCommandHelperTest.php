@@ -42,6 +42,17 @@ class MoveCommandHelperTest extends \PHPUnit_Framework_TestCase
         $this->from               = MoveCommand::FROM;
         $this->destination        = '/tmp/betasmission';
         $this->defaultDestination = '/tmp/betasmission';
+
+        mkdir('/tmp/betasmission');
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+        rmdir('/tmp/betasmission');
     }
 
     /**
