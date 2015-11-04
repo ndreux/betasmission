@@ -22,7 +22,7 @@ class FileManagementBusinessTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->logger = new Logger();
-        mkdir('/tmp/betasmission');
+        mkdir('/tmp/betasmission', 0777, true);
     }
 
     /**

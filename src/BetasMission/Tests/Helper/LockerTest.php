@@ -17,7 +17,7 @@ class LockerTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        mkdir('/tmp/betasmission');
+        mkdir('/tmp/betasmission', 0777, true);
     }
 
     /**

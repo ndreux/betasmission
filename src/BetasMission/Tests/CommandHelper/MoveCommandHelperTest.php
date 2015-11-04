@@ -43,7 +43,7 @@ class MoveCommandHelperTest extends \PHPUnit_Framework_TestCase
         $this->destination        = '/tmp/betasmission';
         $this->defaultDestination = '/tmp/betasmission';
 
-        mkdir('/tmp/betasmission');
+        mkdir('/tmp/betasmission', 0777, true);
     }
 
     /**

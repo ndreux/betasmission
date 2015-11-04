@@ -16,7 +16,7 @@
     </logging>
 
     <php>
-        <env name="env" value="TEST" />
+        <env name="env" value="DEV" />
     </php>
 
     <filter>
