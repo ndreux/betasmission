@@ -17,6 +17,9 @@ class Mailer
      */
     public function send(Swift_Mime_SimpleMimeEntity $message)
     {
+        if ($this->isTestEnv()) {
+            return 0;
+        }
         return $this->getSwiftMailerInstance()->send($message);
     }
 
@@ -30,5 +33,13 @@ class Mailer
             ->setPassword('admin#osaxis');
 
         return new \Swift_Mailer($transport);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isTestEnv()
+    {
+        return getenv('env') == 'TEST';
     }
 }
