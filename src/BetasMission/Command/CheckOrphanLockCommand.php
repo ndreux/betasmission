@@ -40,7 +40,7 @@ class CheckOrphanLockCommand extends AbstractCommand
      */
     public function getTimeStampLock($tempFile)
     {
-        return filectime($tempFile);
+        return file_exists($tempFile) ? filectime($tempFile) : 0;
     }
 
     /**
