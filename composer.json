@@ -11,7 +11,8 @@
   ],
   "require": {
     "phpunit/phpunit": "4.8.*",
-    "swiftmailer/swiftmailer": "@stable"
+    "swiftmailer/swiftmailer": "@stable",
+    "guzzlehttp/guzzle": "^6.1"
   },
   "autoload": {
     "psr-0": {"BetasMission\\": "src/"}
