@@ -194,7 +194,9 @@ class TraktTvApiWrapper
             ]
         );
 
-        return array_shift(json_decode($response->getBody()->getContents()));
+        $response = json_decode($response->getBody()->getContents());
+
+        return array_shift($response);
     }
 
 }
