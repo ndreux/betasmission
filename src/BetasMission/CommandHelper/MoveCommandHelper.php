@@ -3,7 +3,11 @@
 namespace BetasMission\CommandHelper;
 
 use BetasMission\Business\FileManagementBusiness;
+use BetasMission\Helper\BetaseriesApiWrapper;
 use BetasMission\Helper\Logger;
+use BetasMission\Helper\TraktTvApiWrapper;
+use Exception;
+use stdClass;
 
 /**
  * Class MoveCommandHelper
@@ -32,6 +36,16 @@ class MoveCommandHelper extends AbstractCommandHelper
     private $fileManagementBusiness;
 
     /**
+     * @var BetaseriesApiWrapper
+     */
+    private $betaseriesApiWrapper;
+
+    /**
+     * @var TraktTvApiWrapper
+     */
+    private $traktTvApiWrapper;
+
+    /**
      * MoveCommandHelper constructor.
      *
      * @param string $from
@@ -42,6 +56,9 @@ class MoveCommandHelper extends AbstractCommandHelper
     {
         parent::__construct($logger);
         $this->fileManagementBusiness = new FileManagementBusiness($logger);
+
+        $this->betaseriesApiWrapper = new BetaseriesApiWrapper();
+        $this->traktTvApiWrapper    = new TraktTvApiWrapper();
 
         $this->from               = $from;
         $this->destination        = $destination;
@@ -80,5 +97,27 @@ class MoveCommandHelper extends AbstractCommandHelper
         }
 
         return $this->destination.'/'.$showLabel;
+    }
+
+    /**
+     * @param stdClass $episodeData
+     *
+     * @return void
+     */
+    public function markAsDownloaded($episodeData)
+    {
+        try {
+            $this->betaseriesApiWrapper->markAsDownloaded($episodeData->episode->id);
+            $this->logger->log('Marked the episode as downloaded');
+        } catch (Exception $e) {
+            $this->logger->log('The user does dot watch this show.');
+        }
+
+        try {
+            $this->traktTvApiWrapper->markAsDownloaded($episodeData->episode->thetvdb_id);
+            $this->logger->log('Marked the episode as downloaded');
+        } catch (Exception $e) {
+            $this->logger->log('The user does dot watch this show.');
+        }
     }
 }

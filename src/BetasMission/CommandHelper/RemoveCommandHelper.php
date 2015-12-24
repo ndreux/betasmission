@@ -4,6 +4,7 @@ namespace BetasMission\CommandHelper;
 
 use BetasMission\Business\FileManagementBusiness;
 use BetasMission\Helper\Logger;
+use BetasMission\Helper\TraktTvApiWrapper;
 
 /**
  * Class RemoveCommandHelper
@@ -22,6 +23,11 @@ class RemoveCommandHelper
     private $fileManagementBusiness;
 
     /**
+     * @var TraktTvApiWrapper
+     */
+    private $traktTvApiWrapper;
+
+    /**
      * RemoveCommandHelper constructor.
      *
      * @param Logger $logger
@@ -30,6 +36,7 @@ class RemoveCommandHelper
     {
         $this->logger                 = $logger;
         $this->fileManagementBusiness = new FileManagementBusiness($this->logger);
+        $this->traktTvApiWrapper      = new TraktTvApiWrapper();
 
     }
 
@@ -39,5 +46,13 @@ class RemoveCommandHelper
     public function remove($toBeRemoved)
     {
         $this->fileManagementBusiness->remove($toBeRemoved);
+    }
+
+    /**
+     * @param int $thetvdbId
+     */
+    public function removeFromCollection($thetvdbId)
+    {
+        $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
     }
 }

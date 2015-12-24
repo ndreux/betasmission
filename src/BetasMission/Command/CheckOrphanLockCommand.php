@@ -2,8 +2,8 @@
 
 namespace BetasMission\Command;
 
+use BetasMission\Helper\Locker;
 use BetasMission\Helper\Mailer;
-use BetasMission\Helper\TraktTvApiWrapper;
 use BetasMission\MailType\OrphanLockMessage;
 use DateTime;
 
@@ -17,23 +17,20 @@ class CheckOrphanLockCommand extends AbstractCommand
      */
     public function execute()
     {
-        $apiWrapper = new TraktTvApiWrapper();
-        $apiWrapper->authenticate();
+        $tempFiles = scandir(Locker::LOCK_PATH);
 
-//        $tempFiles = scandir(Locker::LOCK_PATH);
-//
-//        foreach ($tempFiles as $tempFile) {
-//            if (strpos($tempFile, Locker::LOCK_FILE) === false) {
-//                continue;
-//            }
-//
-//            $lockFileTimeStamp = $this->getTimeStampLock(Locker::LOCK_PATH.$tempFile);
-//            if ($lockFileTimeStamp != 0 && (new DateTime('now'))->getTimestamp() > $lockFileTimeStamp + 3600) {
-//                return $this->sendAlert($tempFile, (new DateTime('now'))->setTimestamp($lockFileTimeStamp));
-//            }
-//        }
-//
-//        return false;
+        foreach ($tempFiles as $tempFile) {
+            if (strpos($tempFile, Locker::LOCK_FILE) === false) {
+                continue;
+            }
+
+            $lockFileTimeStamp = $this->getTimeStampLock(Locker::LOCK_PATH.$tempFile);
+            if ($lockFileTimeStamp != 0 && (new DateTime('now'))->getTimestamp() > $lockFileTimeStamp + 3600) {
+                return $this->sendAlert($tempFile, (new DateTime('now'))->setTimestamp($lockFileTimeStamp));
+            }
+        }
+
+        return false;
     }
 
     /**

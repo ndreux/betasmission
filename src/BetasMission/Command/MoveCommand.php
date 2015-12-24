@@ -74,12 +74,7 @@ class MoveCommand extends AbstractCommand
             }
 
             if ($this->commandHelper->moveShow($episode, $destinationPath) && isset($episodeData)) {
-                try {
-                    $this->apiWrapper->markAsDownloaded($episodeData->episode->id);
-                    $this->logger->log('Marked the episode has downloaded');
-                } catch (Exception $e) {
-                    $this->logger->log('The user does dot watch this show.');
-                }
+                $this->commandHelper->markAsDownloaded($episodeData);
             }
         }
     }

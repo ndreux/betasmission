@@ -61,6 +61,7 @@ class RemoveWatchedCommand extends AbstractCommand
 
                 $this->logger->log('Episode seen : '.($episodeData->episode->user->seen ? 'true' : 'false'));
                 if ($episodeData->episode->user->seen) {
+                    $this->commandActionHelper->removeFromCollection($episodeData->episode->thetvdb_id);
                     $this->commandActionHelper->remove($this->from.'/'.$show.'/'.$episode);
                 }
             }
