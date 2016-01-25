@@ -47,6 +47,12 @@ class RemoveWatchedCommand extends AbstractCommand
 
         foreach ($shows as $show) {
             $this->logger->log('Show : '.$show);
+
+            if ($this->commandActionHelper->isWhiteListed($this->from.'/'.$show)) {
+                $this->logger->log('Show white listed');
+                continue;
+            }
+
             $episodes = array_diff(scandir($this->from.'/'.$show), ['..', '.']);
 
             foreach ($episodes as $i => $episode) {

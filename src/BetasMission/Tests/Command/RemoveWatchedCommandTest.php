@@ -46,15 +46,21 @@ class RemoveWatchedCommandTest extends PHPUnit_Framework_TestCase
         mkdir($from.'/test4');
         touch($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
 
+        mkdir($from.'/test5');
+        touch($from.'/test5/Suits.S01E01.KILLERS.mp4');
+        touch($from.'/test5/.do_not_remove.lock');
+
         $this->assertFileExists($from.'/test2/KLQSDKLQSDQSD.mp4');
         $this->assertFileExists($from.'/test3/Suits.S01E01.KILLERS.mp4');
         $this->assertFileExists($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
+        $this->assertFileExists($from.'/test5/Suits.S01E01.KILLERS.mp4');
 
         $removeCommand = new RemoveWatchedCommand($from);
         $removeCommand->execute();
 
         $this->assertFileExists($from.'/test2/KLQSDKLQSDQSD.mp4');
         $this->assertFileExists($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
+        $this->assertFileExists($from.'/test5/Suits.S01E01.KILLERS.mp4');
         $this->assertFileNotExists($from.'/test3/Suits.S01E01.KILLERS.mp4');
 
         unlink($from.'/test2/KLQSDKLQSDQSD.mp4');
@@ -64,6 +70,10 @@ class RemoveWatchedCommandTest extends PHPUnit_Framework_TestCase
 
         unlink($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
         rmdir($from.'/test4');
+
+        unlink($from.'/test5/Suits.S01E01.KILLERS.mp4');
+        unlink($from.'/test5/.do_not_remove.lock');
+        rmdir($from.'/test5');
         rmdir($from);
     }
 }
