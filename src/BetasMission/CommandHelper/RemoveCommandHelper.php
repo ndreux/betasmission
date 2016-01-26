@@ -55,4 +55,16 @@ class RemoveCommandHelper
     {
         $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
     }
+
+    /**
+     * Return true if the show is while listed and must not be deleted
+     *
+     * @param string $showPath
+     *
+     * @return bool
+     */
+    public function isWhiteListed($showPath)
+    {
+        return file_exists($showPath.'/.do_not_remove.lock');
+    }
 }
