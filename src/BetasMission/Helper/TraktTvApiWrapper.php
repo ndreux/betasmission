@@ -177,7 +177,7 @@ class TraktTvApiWrapper
      *
      * @return stdClass
      */
-    private function searchEpisode($tvdbId)
+    public function searchEpisode($tvdbId)
     {
         $headers = [
             'trakt-api-key'     => self::CLIENT_ID,
@@ -199,4 +199,25 @@ class TraktTvApiWrapper
         return array_shift($response);
     }
 
+    /**
+     * Return true if an episode is marked as watched on trakt tv
+     *
+     * @param int $traktTvId
+     *
+     * @return bool
+     */
+    public function hasEpisodeBeenSeen($traktTvId)
+    {
+        $headers = [
+            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
+            'trakt-api-key'     => self::CLIENT_ID,
+            'Content-Type'      => 'application/json',
+            'trakt-api-version' => 2
+        ];
+
+        $client   = new Client();
+        $response = $client->get(sprintf(self::API_URL.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]);
+
+        return !empty(json_decode($response->getBody()->getContents()));
+    }
 }

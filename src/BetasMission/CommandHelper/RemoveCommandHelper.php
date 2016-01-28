@@ -3,8 +3,11 @@
 namespace BetasMission\CommandHelper;
 
 use BetasMission\Business\FileManagementBusiness;
+use BetasMission\Helper\BetaseriesApiWrapper;
 use BetasMission\Helper\Logger;
 use BetasMission\Helper\TraktTvApiWrapper;
+use Exception;
+use stdClass;
 
 /**
  * Class RemoveCommandHelper
@@ -28,6 +31,11 @@ class RemoveCommandHelper
     private $traktTvApiWrapper;
 
     /**
+     * @var BetaseriesApiWrapper
+     */
+    private $betaseriesApiWrapper;
+
+    /**
      * RemoveCommandHelper constructor.
      *
      * @param Logger $logger
@@ -37,6 +45,7 @@ class RemoveCommandHelper
         $this->logger                 = $logger;
         $this->fileManagementBusiness = new FileManagementBusiness($this->logger);
         $this->traktTvApiWrapper      = new TraktTvApiWrapper();
+        $this->betaseriesApiWrapper   = new BetaseriesApiWrapper();
 
     }
 
@@ -66,5 +75,25 @@ class RemoveCommandHelper
     public function isWhiteListed($showPath)
     {
         return file_exists($showPath.'/.do_not_remove.lock');
+    }
+
+    /**
+     * Return the episode data from TraktTv matching the given file name
+     *
+     * @param string $fileName
+     *
+     * @return stdClass
+     * @throws Exception
+     */
+    public function getEpisodeFromFileName($fileName)
+    {
+        $episodeData = $this->betaseriesApiWrapper->getEpisodeData($fileName);
+
+        return $this->traktTvApiWrapper->searchEpisode($episodeData->episode->thetvdb_id);
+    }
+
+    public function hasEpisodeBeenSeen($traktTvId)
+    {
+        return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
     }
 }
