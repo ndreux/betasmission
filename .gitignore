@@ -1,5 +1,4 @@
 /.idea
 vendor
-composer.lock
 coverage/*
 atlassian-ide-plugin.xml
