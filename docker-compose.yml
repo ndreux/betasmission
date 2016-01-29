@@ -2,3 +2,6 @@ raspbian:
   image: ndreux/betasmission
   volumes:
     - ./:/home/pi/betasmission
+  environment:
+    - XDEBUG_CONFIG=idekey=f9AniDNdV680B8yDP
+    - PHP_IDE_CONFIG=serverName=PiLocal

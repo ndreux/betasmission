@@ -59,14 +59,16 @@ class RemoveWatchedCommand extends AbstractCommand
                 $this->logger->log($episode);
 
                 try {
-                    $episodeData = $this->apiWrapper->getEpisodeData($episode);
+                    $episodeData = $this->commandActionHelper->getEpisodeFromFileName($episode);
                 } catch (\Exception $e) {
                     $this->logger->log('Episode not found on BetaSeries');
                     continue;
                 }
 
-                $this->logger->log('Episode seen : '.($episodeData->episode->user->seen ? 'true' : 'false'));
-                if ($episodeData->episode->user->seen) {
+                $hasBeenSeen = $this->commandActionHelper->hasEpisodeBeenSeen($episodeData->episode->ids->trakt);
+                $this->logger->log('Episode seen : '.($hasBeenSeen ? 'true' : 'false'));
+                if ($hasBeenSeen) {
+                    $this->commandActionHelper->removeFromCollection($episodeData->episode->ids->tvdb);
                     $this->commandActionHelper->remove($this->from.'/'.$show.'/'.$episode);
                 }
             }
