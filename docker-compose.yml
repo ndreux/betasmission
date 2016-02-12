@@ -1,5 +1,6 @@
 raspbian:
-  image: ndreux/betasmission
+  image: ndreux/betasmission:1.0.3
+#  build: ./build
   volumes:
     - ./:/home/pi/betasmission
   environment:
