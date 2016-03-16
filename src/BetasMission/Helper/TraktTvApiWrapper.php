@@ -14,12 +14,12 @@ class TraktTvApiWrapper
 
     const CLIENT_ID       = 'db4e4c24f7d4bb762e1c0c5858aa6c148fad2c608853c1c46db7a4bca7129259';
     const CLIENT_SECRET   = 'a97533b54ae9f9be98084888dbc3291b2ecc45088ca6e478d446d32c5fc24794';
-    const APPLICATION_PIN = 'FEEFF3F3';
+    const APPLICATION_PIN = 'C10C07A0';
 
     const API_URL = 'https://api-v2launch.trakt.tv';
 
-    const ACCESS_TOKEN  = '9add6f3dbb02c54ddea33b6b606cd0c41ba5ca82554a145554c1f0d31810fc23';
-    const REFRESH_TOKEN = '0898a02446efc4970d63cf58aeaf493b7129f06c20f8154fe1ce0c34c0c82cf3';
+    const ACCESS_TOKEN  = '30ebaf173e9b06a3e4d9684482a62c947c471c2683ad870d0b1ba5a1beeda0e7';
+    const REFRESH_TOKEN = '8b9818db77c7e9ebf573883446af52a8668df1694ba95629b0455475466ff3e3';
 
     /**
      * @return null
