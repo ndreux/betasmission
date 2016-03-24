@@ -67,8 +67,9 @@ class MoveCommand extends AbstractCommand
 
             try {
                 $episodeData     = $this->apiWrapper->getEpisodeData($episode);
-                $destinationPath = $this->commandHelper->getTVShowDestinationPath($episodeData->episode->show->title);
-            } catch (\Exception $e) {
+                $destinationPath = (!empty($episodeData->episode->show->title)) ? $this->commandHelper->getTVShowDestinationPath($episodeData->episode->show->title) : $this->defaultDestination;
+            }
+            catch (\Exception $e) {
                 $this->logger->log('The episode has not been found.');
                 $destinationPath = $this->defaultDestination;
             }
