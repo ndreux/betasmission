@@ -62,11 +62,10 @@ class RemoveWatchedCommandTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
         $this->assertFileExists($from.'/test5/Suits.S01E01.KILLERS.mp4');
         $this->assertFileNotExists($from.'/test3/Suits.S01E01.KILLERS.mp4');
+        $this->assertFileNotExists($from.'/test3');
 
         unlink($from.'/test2/KLQSDKLQSDQSD.mp4');
         rmdir($from.'/test2');
-
-        rmdir($from.'/test3');
 
         unlink($from.'/test4/My.little.pony.S01E01.KILLERS.mp4');
         rmdir($from.'/test4');

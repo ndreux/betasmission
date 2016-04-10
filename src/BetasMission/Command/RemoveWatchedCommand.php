@@ -10,7 +10,7 @@ use BetasMission\Helper\Context;
  */
 class RemoveWatchedCommand extends AbstractCommand
 {
-    const FROM    = '/mnt/smb/Labox/Series/Actives';
+    const FROM = '/mnt/smb/Labox/Series/Actives';
     const CONTEXT = Context::CONTEXT_REMOVE;
 
     /**
@@ -32,7 +32,7 @@ class RemoveWatchedCommand extends AbstractCommand
     {
         parent::__construct();
 
-        $this->from                = $from;
+        $this->from = $from;
         $this->commandActionHelper = new RemoveCommandHelper($this->logger);
     }
 
@@ -43,19 +43,25 @@ class RemoveWatchedCommand extends AbstractCommand
     {
         $shows = array_diff(scandir($this->from), ['..', '.']);
 
-        $this->logger->log(count($shows).' found');
+        $this->logger->log(count($shows) . ' found');
 
         foreach ($shows as $show) {
-            $this->logger->log('Show : '.$show);
+            $this->logger->log('Show : ' . $show);
 
-            if ($this->commandActionHelper->isWhiteListed($this->from.'/'.$show)) {
+            if ($this->commandActionHelper->isWhiteListed($this->from . '/' . $show)) {
                 $this->logger->log('Show white listed');
                 continue;
             }
 
-            $episodes = array_diff(scandir($this->from.'/'.$show), ['..', '.']);
+            $episodes = array_diff(scandir($this->from . '/' . $show), ['..', '.']);
+
+            if (count($episodes) === 0) {
+                $this->logger->log('No show in Episode directory. Remove ' . $this->from . '/' . $show);
+                $this->commandActionHelper->remove($this->from . '/' . $show);
+            }
 
             foreach ($episodes as $i => $episode) {
+                $episodeCount = count($episodes);
                 $this->logger->log($episode);
 
                 try {
@@ -66,10 +72,19 @@ class RemoveWatchedCommand extends AbstractCommand
                 }
 
                 $hasBeenSeen = $this->commandActionHelper->hasEpisodeBeenSeen($episodeData->episode->ids->trakt);
-                $this->logger->log('Episode seen : '.($hasBeenSeen ? 'true' : 'false'));
+                $this->logger->log('Episode seen : ' . ($hasBeenSeen ? 'true' : 'false'));
+
                 if ($hasBeenSeen) {
+
                     $this->commandActionHelper->removeFromCollection($episodeData->episode->ids->tvdb);
-                    $this->commandActionHelper->remove($this->from.'/'.$show.'/'.$episode);
+                    $this->commandActionHelper->remove($this->from . '/' . $show . '/' . $episode);
+
+                    $episodeCount--;
+
+                    if ($episodeCount === 0) {
+                        $this->logger->log('No more show in Episode directory. Remove ' . $this->from . '/' . $show);
+                        $this->commandActionHelper->remove($this->from . '/' . $show);
+                    }
                 }
             }
         }
