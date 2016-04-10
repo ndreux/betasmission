@@ -59,7 +59,7 @@ class RemoveWatchedCommand extends AbstractCommand
                 $episodeCount = count($episodes);
                 $this->logger->log($episode);
 
-                if (!$this->commandActionHelper->isVideo($episode)) {
+                if (is_file($this->from . '/' . $show . '/' . $episode) && !$this->commandActionHelper->isVideo($episode)) {
                     $this->logger->log(sprintf('The file %s is not a video file. Continue.', $episode));
                 }
 
