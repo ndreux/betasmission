@@ -96,4 +96,15 @@ class RemoveCommandHelper
     {
         return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
     }
+    
+    
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function isVideo($file)
+    {
+        return $this->fileManagementBusiness->isVideo($file);
+    }
 }

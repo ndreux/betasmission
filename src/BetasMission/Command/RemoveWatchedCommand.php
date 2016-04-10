@@ -55,14 +55,13 @@ class RemoveWatchedCommand extends AbstractCommand
 
             $episodes = array_diff(scandir($this->from . '/' . $show), ['..', '.']);
 
-            if (count($episodes) === 0) {
-                $this->logger->log('No show in Episode directory. Remove ' . $this->from . '/' . $show);
-                $this->commandActionHelper->remove($this->from . '/' . $show);
-            }
-
             foreach ($episodes as $i => $episode) {
                 $episodeCount = count($episodes);
                 $this->logger->log($episode);
+
+                if (!$this->commandActionHelper->isVideo($episode)) {
+                    $this->logger->log(sprintf('The file %s is not a video file. Continue.', $episode));
+                }
 
                 try {
                     $episodeData = $this->commandActionHelper->getEpisodeFromFileName($episode);
@@ -82,7 +81,7 @@ class RemoveWatchedCommand extends AbstractCommand
                     $episodeCount--;
 
                     if ($episodeCount === 0) {
-                        $this->logger->log('No more show in Episode directory. Remove ' . $this->from . '/' . $show);
+                        $this->logger->log('No more show in Show directory. Remove ' . $this->from . '/' . $show);
                         $this->commandActionHelper->remove($this->from . '/' . $show);
                     }
                 }

@@ -2,6 +2,8 @@
 
 namespace BetasMission\CommandHelper;
 
+use BetasMission\Business\FileManagementBusiness;
+use BetasMission\Helper\Logger;
 use stdClass;
 
 /**
@@ -10,6 +12,24 @@ use stdClass;
 class DownloadSubtitleCommandHelper extends AbstractCommandHelper
 {
     const SUBTITLE_EXTENSION = '.srt';
+
+    /**
+     * @var FileManagementBusiness
+     */
+    private $fileManagementBusiness;
+
+
+    /**
+     * DownloadSubtitleCommandHelper constructor.
+     *
+     * @param Logger $logger
+     */
+    public function __construct(Logger $logger)
+    {
+        parent::__construct($logger);
+        $this->fileManagementBusiness = new FileManagementBusiness($logger);
+    }
+
 
     /**
      * @return array
@@ -36,14 +56,14 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
             $files = array_diff(scandir($episode), ['..', '.']);
 
             foreach ($files as $file) {
-                if ($this->episodeHasSubtitle($episode.'/'.$file)) {
+                if ($this->episodeHasSubtitle($episode . '/' . $file)) {
                     return true;
                 };
             }
 
             return false;
         } else {
-            if (!$this->isVideo($episode)) {
+            if (!$this->fileManagementBusiness->isVideo($episode)) {
                 return;
             }
 
@@ -93,11 +113,11 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
             $files = array_diff(scandir($episode), ['..', '.']);
 
             foreach ($files as $file) {
-                if (!$this->isVideo($file)) {
+                if (!$this->fileManagementBusiness->isVideo($file)) {
                     continue;
                 }
 
-                copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode.'/'.$file));
+                copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode . '/' . $file));
                 unlink($tempSubtitle);
 
                 return true;
@@ -136,21 +156,9 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         $data = curl_exec($curlSession);
         curl_close($curlSession);
 
-        file_put_contents('/tmp/'.$subtitleLabel, $data);
+        file_put_contents('/tmp/' . $subtitleLabel, $data);
 
-        return '/tmp/'.$subtitleLabel;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function isVideo($file)
-    {
-        $filePathInfo = pathinfo($file);
-
-        return in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi']);
+        return '/tmp/' . $subtitleLabel;
     }
 
     /**
@@ -174,7 +182,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     {
         $episodePathInfo = pathinfo($episode);
 
-        return $episodePathInfo['dirname'].'/'.$episodePathInfo['filename'].self::SUBTITLE_EXTENSION;
+        return $episodePathInfo['dirname'] . '/' . $episodePathInfo['filename'] . self::SUBTITLE_EXTENSION;
     }
 
     /**
@@ -229,7 +237,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     private function getEpisodeTeam($episodeName)
     {
-        $episodeInfo         = pathinfo($episodeName);
+        $episodeInfo = pathinfo($episodeName);
         $explodedEpisodeName = explode('.', $this->slugify($episodeInfo['filename']));
 
         foreach ($explodedEpisodeName as $episodeNamePart) {
@@ -263,5 +271,15 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         }
 
         return $bestSubtitle;
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function isVideo($file)
+    {
+        return $this->fileManagementBusiness->isVideo($file);
     }
 }

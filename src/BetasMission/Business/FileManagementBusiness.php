@@ -37,11 +37,11 @@ class FileManagementBusiness
             mkdir($dst);
             while (false !== ($file = readdir($dir))) {
                 if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src.'/'.$file)) {
-                        $this->copy($src.'/'.$file, $dst.'/'.$file);
+                    if (is_dir($src . '/' . $file)) {
+                        $this->copy($src . '/' . $file, $dst . '/' . $file);
                     } else {
-                        $this->logger->log('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
-                        copy($src.'/'.$file, $dst.'/'.$file);
+                        $this->logger->log('Copy : ' . $src . '/' . $file . ' to ' . $dst . '/' . $file);
+                        copy($src . '/' . $file, $dst . '/' . $file);
                     }
                 }
             }
@@ -60,17 +60,29 @@ class FileManagementBusiness
             $dir = opendir($src);
             while (false !== ($file = readdir($dir))) {
                 if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src.'/'.$file)) {
-                        $this->remove($src.'/'.$file);
+                    if (is_dir($src . '/' . $file)) {
+                        $this->remove($src . '/' . $file);
                     } else {
-                        $this->logger->log('Remove : '.$src.'/'.$file);
-                        unlink($src.'/'.$file);
+                        $this->logger->log('Remove : ' . $src . '/' . $file);
+                        unlink($src . '/' . $file);
                     }
                 }
             }
-            $this->logger->log('Remove : '.$src);
+            $this->logger->log('Remove : ' . $src);
             rmdir($src);
             closedir($dir);
         }
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function isVideo($file)
+    {
+        $filePathInfo = pathinfo($file);
+
+        return in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi']);
     }
 }
