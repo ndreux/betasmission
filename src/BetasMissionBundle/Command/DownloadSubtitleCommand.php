@@ -4,13 +4,15 @@ namespace BetasMissionBundle\Command;
 
 use BetasMissionBundle\CommandHelper\DownloadSubtitleCommandHelper;
 use BetasMissionBundle\Helper\Context;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class DownloadSubtitleCommand
  */
-class DownloadSubtitleCommand extends AbstractCommand
+class DownloadSubtitleCommand extends ContainerAwareCommand
 {
     const CONTEXT = Context::CONTEXT_DOWNLOAD_SUBTITLE;
     const FROM = '/mnt/smb/Labox/Series/Actives/';
@@ -21,80 +23,76 @@ class DownloadSubtitleCommand extends AbstractCommand
     private $from;
 
     /**
-     * @var DownloadSubtitleCommandHelper
-     */
-    private $commandHelper;
-
-    /**
-     * @param string $from
-     */
-    public function __construct($from = self::FROM)
-    {
-        parent::__construct();
-        $this->from = $from;
-        $this->commandHelper = new DownloadSubtitleCommandHelper($this->logger);
-    }
-
-    /**
      * Configure
      */
     protected function configure()
     {
         $this->setName('betasmission:subtitle')
-            ->setDescription('Check if scripts are not locked');
+            ->setDescription('Check if scripts are not locked')
+            ->addArgument(
+                'from',
+                InputArgument::REQUIRED,
+                'TVShow root directory'
+            );
+
     }
 
     /**
      * @param InputInterface  $input
-     * @param OutputInterface $outputInterface
+     * @param OutputInterface $output
      *
      * @return int|null|void
      * @throws \Exception
      */
-    public function execute(InputInterface $input, OutputInterface $outputInterface)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
-        $shows = array_diff(scandir($this->from), ['..', '.']);
+        $from = $input->getArgument('from');
+        $logger = $this->getContainer()->get('logger');
 
-        $this->logger->log(count($shows) . ' found');
+        $commandHelper = new DownloadSubtitleCommandHelper($logger);
+
+        $shows = array_diff(scandir($from), ['..', '.']);
+
+        $logger->info(count($shows) . ' found');
 
         foreach ($shows as $show) {
-            $this->logger->log('Show : ' . $show);
-            $episodes = array_diff(scandir($this->from . '/' . $show), ['..', '.']);
+            $logger->info('Show : ' . $show);
+            $episodes = array_diff(scandir($from . '/' . $show), ['..', '.']);
 
             foreach ($episodes as $i => $episode) {
-                $this->logger->log($episode);
+                $logger->info($episode);
 
-                $isVOSTFR = $this->commandHelper->isVOSTFREpisode($this->from . $show . '/' . $episode);
+                $isVOSTFR = $commandHelper->isVOSTFREpisode($from . $show . '/' . $episode);
                 if ($isVOSTFR) {
-                    $this->logger->log('VOSTFR Episode. Does not need subtitle');
+                    $logger->info('VOSTFR Episode. Does not need subtitle');
                     continue;
                 }
 
-                $hasSubtitle = $this->commandHelper->episodeHasSubtitle($this->from . $show . '/' . $episode);
+                $hasSubtitle = $commandHelper->episodeHasSubtitle($from . $show . '/' . $episode);
                 if ($hasSubtitle === null || $hasSubtitle === true) {
-                    $this->logger->log('Episode already has a subtitle');
+                    $logger->info('Episode already has a subtitle');
                     continue;
                 }
 
                 try {
-                    $episodeData = $this->apiWrapper->getEpisodeData($episode);
+                    $episodeData = $commandHelper->getEpisodeData($episode);
                 } catch (\Exception $e) {
-                    $this->logger->log('Episode not found on BetaSeries');
+                    $logger->info('Episode not found on BetaSeries');
                     continue;
                 }
 
-                $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($episodeData->episode->id);
-                $this->logger->log(count($subtitles->subtitles) . ' found');
+                $subtitles = $commandHelper->getSubtitleByEpisodeId($episodeData->episode->id);
+                $logger->info(count($subtitles->subtitles) . ' found');
 
-                $subtitle = $this->commandHelper->getBestSubtitle($subtitles, $episode);
+                $subtitle = $commandHelper->getBestSubtitle($subtitles, $episode);
 
                 if ($subtitle === null) {
-                    $this->logger->log('Subtitles not found on BetaSeries');
+                    $logger->info('Subtitles not found on BetaSeries');
                     continue;
                 }
 
-                $this->commandHelper->applySubTitle($this->from . $show . '/' . $episode, $subtitle);
-                $this->logger->log('Subtitle applied');
+                $commandHelper->applySubTitle($from . $show . '/' . $episode, $subtitle);
+                $logger->info('Subtitle applied');
             }
         }
     }

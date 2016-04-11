@@ -35,7 +35,7 @@ class RemoveWatchedCommand extends AbstractCommand
         parent::__construct();
 
         $this->from = $from;
-        $this->commandActionHelper = new RemoveCommandHelper($this->logger);
+        //$this->commandActionHelper = new RemoveCommandHelper($this->logger);
     }
 
     /**

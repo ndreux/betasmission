@@ -2,7 +2,7 @@
 
 namespace BetasMissionBundle\Business;
 
-use BetasMissionBundle\Helper\Logger;
+use Symfony\Bridge\Monolog\Logger;
 
 class FileManagementBusiness
 {
@@ -37,7 +37,7 @@ class FileManagementBusiness
                     if (is_dir($src . '/' . $file)) {
                         $this->copy($src . '/' . $file, $dst . '/' . $file);
                     } else {
-                        $this->logger->log('Copy : ' . $src . '/' . $file . ' to ' . $dst . '/' . $file);
+                        $this->logger->info('Copy : ' . $src . '/' . $file . ' to ' . $dst . '/' . $file);
                         copy($src . '/' . $file, $dst . '/' . $file);
                     }
                 }
@@ -60,12 +60,12 @@ class FileManagementBusiness
                     if (is_dir($src . '/' . $file)) {
                         $this->remove($src . '/' . $file);
                     } else {
-                        $this->logger->log('Remove : ' . $src . '/' . $file);
+                        $this->logger->info('Remove : ' . $src . '/' . $file);
                         unlink($src . '/' . $file);
                     }
                 }
             }
-            $this->logger->log('Remove : ' . $src);
+            $this->logger->info('Remove : ' . $src);
             rmdir($src);
             closedir($dir);
         }

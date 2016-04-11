@@ -53,7 +53,7 @@ class MoveCommand extends AbstractCommand
         $this->destination        = $destination;
         $this->defaultDestination = $defaultDestination;
 
-        $this->commandHelper = new MoveCommandHelper($this->logger, $this->from, $this->destination, $this->defaultDestination);
+        //$this->commandHelper = new MoveCommandHelper($this->logger, $this->from, $this->destination, $this->defaultDestination);
     }
     
     /**

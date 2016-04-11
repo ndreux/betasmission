@@ -3,8 +3,9 @@
 namespace BetasMissionBundle\CommandHelper;
 
 use BetasMissionBundle\Business\FileManagementBusiness;
-use BetasMissionBundle\Helper\Logger;
+use BetasMissionBundle\Helper\BetaseriesApiWrapper;
 use stdClass;
+use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class DownloadSubtitleCommandHelper
@@ -18,6 +19,11 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     private $fileManagementBusiness;
 
+    /**
+     * @var BetaseriesApiWrapper
+     */
+    private $apiWrapper;
+
 
     /**
      * DownloadSubtitleCommandHelper constructor.
@@ -26,8 +32,9 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     public function __construct(Logger $logger)
     {
-        parent::__construct($logger);
+        $this->logger = $logger;
         $this->fileManagementBusiness = new FileManagementBusiness($logger);
+        $this->apiWrapper = new BetaseriesApiWrapper();
     }
 
 
@@ -281,5 +288,15 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     public function isVideo($file)
     {
         return $this->fileManagementBusiness->isVideo($file);
+    }
+
+    public function getEpisodeData($episode)
+    {
+        return $this->apiWrapper->getEpisodeData($episode);
+    }
+
+    public function getSubtitleByEpisodeId($id)
+    {
+        return $this->apiWrapper->getSubtitleByEpisodeId($id);
     }
 }
