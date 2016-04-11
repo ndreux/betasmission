@@ -17,7 +17,7 @@ RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony
 RUN chmod a+x /usr/local/bin/symfony
 
 RUN pecl install -o -f xdebug
-#COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 COPY php.ini /usr/local/etc/php/conf.d/php.ini
 
 RUN mkdir -p /var/log/betasmission
