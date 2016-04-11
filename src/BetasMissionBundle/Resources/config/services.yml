@@ -1,0 +1,4 @@
+services:
+    betasmission.mailer:
+        class: BetasMissionBundle\Helper\Mailer
+

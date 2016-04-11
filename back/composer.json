@@ -1,0 +1,20 @@
+{
+  "name": "vendor_name/BetasMission",
+  "description": "description_text",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "author's name",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "phpunit/phpunit": "4.8.*",
+    "swiftmailer/swiftmailer": "@stable",
+    "guzzlehttp/guzzle": "^6.1"
+  },
+  "autoload": {
+    "psr-0": {"BetasMission\\": "src/"}
+  }
+}
