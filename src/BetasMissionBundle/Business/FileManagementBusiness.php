@@ -34,11 +34,11 @@ class FileManagementBusiness
             mkdir($dst);
             while (false !== ($file = readdir($dir))) {
                 if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src . '/' . $file)) {
-                        $this->copy($src . '/' . $file, $dst . '/' . $file);
+                    if (is_dir($src.'/'.$file)) {
+                        $this->copy($src.'/'.$file, $dst.'/'.$file);
                     } else {
-                        $this->logger->info('Copy : ' . $src . '/' . $file . ' to ' . $dst . '/' . $file);
-                        copy($src . '/' . $file, $dst . '/' . $file);
+                        $this->logger->info('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
+                        copy($src.'/'.$file, $dst.'/'.$file);
                     }
                 }
             }
@@ -57,15 +57,15 @@ class FileManagementBusiness
             $dir = opendir($src);
             while (false !== ($file = readdir($dir))) {
                 if (($file != '.') && ($file != '..')) {
-                    if (is_dir($src . '/' . $file)) {
-                        $this->remove($src . '/' . $file);
+                    if (is_dir($src.'/'.$file)) {
+                        $this->remove($src.'/'.$file);
                     } else {
-                        $this->logger->info('Remove : ' . $src . '/' . $file);
-                        unlink($src . '/' . $file);
+                        $this->logger->info('Remove : '.$src.'/'.$file);
+                        unlink($src.'/'.$file);
                     }
                 }
             }
-            $this->logger->info('Remove : ' . $src);
+            $this->logger->info('Remove : '.$src);
             rmdir($src);
             closedir($dir);
         }
@@ -81,5 +81,44 @@ class FileManagementBusiness
         $filePathInfo = pathinfo($file);
 
         return in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi']);
+    }
+
+    /**
+     * @param $directory
+     *
+     * @return string[]
+     */
+    public function scandir($directory)
+    {
+        return array_diff(scandir($directory), ['..', '.']);
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function isZip($file)
+    {
+        $filePathInfo = pathinfo($file);
+
+        return in_array($filePathInfo['extension'], ['zip']);
+    }
+
+    /**
+     * @param $text
+     *
+     * @return mixed|string
+     */
+    public function slugify($text)
+    {
+        $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+        $text = trim($text, '-');
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = strtolower($text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = str_replace('-', '.', $text);
+
+        return (empty($text)) ? null : $text;
     }
 }

@@ -10,7 +10,7 @@ use Symfony\Bridge\Monolog\Logger;
 /**
  * Class DownloadSubtitleCommandHelper
  */
-class DownloadSubtitleCommandHelper extends AbstractCommandHelper
+class DownloadSubtitleCommandHelper
 {
     const SUBTITLE_EXTENSION = '.srt';
 
@@ -24,7 +24,6 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     private $apiWrapper;
 
-
     /**
      * DownloadSubtitleCommandHelper constructor.
      *
@@ -32,24 +31,97 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     public function __construct(Logger $logger)
     {
-        $this->logger = $logger;
+        $this->logger                 = $logger;
         $this->fileManagementBusiness = new FileManagementBusiness($logger);
-        $this->apiWrapper = new BetaseriesApiWrapper();
+        $this->apiWrapper             = new BetaseriesApiWrapper();
     }
 
+    /**
+     * @param string $from
+     */
+    public function downloadSubtitles($from)
+    {
+        $shows = $this->getList($from);
+        $this->logger->info(count($shows).' found');
+
+        foreach ($shows as $show) {
+            $this->downloadSubtitleForShow($show, $from);
+        }
+    }
 
     /**
-     * @return array
+     * Download the subtitles for the given show directory
+     *
+     * @param string $show Show directory
+     * @param string $from Root directory
      */
-    private static function getAvailableTeams()
+    private function downloadSubtitleForShow($show, $from)
     {
-        return array_map(
-            'strtolower',
-            [
-                'KILLERS', 'ASAP', 'LOL', 'FoV', 'YIFY', 'IMMERSE', '0-sec', 'DIMENSION', 'fastsub', 'RIVER', 'tla',
-                'BATV', '2HD', 'FGT', 'QCF', 'DEFiNE', 'TASTETV', 'FQM', 'FEVER', '0TV', 'EVOLVE', 'SNEAkY',
-            ]
-        );
+        $this->logger->info('Show : '.$show);
+
+        $showPath = $from.'/'.$show;
+        $episodes = $this->getList($showPath);
+
+        foreach ($episodes as $i => $episode) {
+            $this->downloadSubtitleForEpisode($episode, $showPath);
+        }
+    }
+
+    /**
+     * Download the subtitles for the given episode
+     *
+     * @param string $episode  Episode file / directory
+     * @param string $showPath Show directory (parent directory)
+     */
+    public function downloadSubtitleForEpisode($episode, $showPath)
+    {
+        $this->logger->info($episode);
+
+        if (!$this->episodeNeedsSubtitle($episode, $showPath)) {
+            return;
+        }
+
+        try {
+            $episodeData = $this->apiWrapper->getEpisodeData($episode);
+        }
+        catch (\Exception $e) {
+            $this->logger->info('Episode not found on BetaSeries');
+
+            return;
+        }
+
+        $subtitles = $this->getSubtitlesByEpisodeId($episodeData->episode->id);
+        $subtitle  = $this->getBestSubtitle($subtitles, $episode);
+
+        if ($subtitle === null) {
+            $this->logger->info('Subtitles not found on BetaSeries');
+
+            return;
+        }
+
+        $this->applySubTitle($showPath.'/'.$episode, $subtitle);
+    }
+
+    /**
+     * Return true if the given episode needs a subtitle
+     *
+     * @param string $episode
+     * @param string $showPath
+     *
+     * @return bool
+     */
+    private function episodeNeedsSubtitle($episode, $showPath)
+    {
+        $isVOSTFR    = $this->isVOSTFREpisode($showPath.'/'.$episode);
+        $hasSubtitle = $this->episodeHasSubtitle($showPath.'/'.$episode);
+
+        if ($isVOSTFR || $hasSubtitle === null || $hasSubtitle === true) {
+            $this->logger->info('VOSTFR Episode. Does not need subtitle');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -57,13 +129,13 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      *
      * @return bool
      */
-    public function episodeHasSubtitle($episode)
+    private function episodeHasSubtitle($episode)
     {
         if (is_dir($episode)) {
-            $files = array_diff(scandir($episode), ['..', '.']);
+            $files = $this->fileManagementBusiness->scandir($episode);
 
             foreach ($files as $file) {
-                if ($this->episodeHasSubtitle($episode . '/' . $file)) {
+                if ($this->episodeHasSubtitle($episode.'/'.$file)) {
                     return true;
                 };
             }
@@ -79,13 +151,14 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     }
 
     /**
-     * @param stdClass
+     * @param stdClass $subtitles
+     * @param string   $episodeName
      *
      * @throws \Exception
      *
      * @return null|stdClass
      */
-    public function getBestSubtitle($subtitles, $episodeName)
+    private function getBestSubtitle($subtitles, $episodeName)
     {
         if (empty($subtitles->subtitles)) {
             return;
@@ -117,14 +190,14 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         $tempSubtitle = $this->downloadTemporarySubtitle($subtitle->url, $subtitle->file);
 
         if (is_dir($episode)) {
-            $files = array_diff(scandir($episode), ['..', '.']);
+            $files = $this->fileManagementBusiness->scandir($episode);
 
             foreach ($files as $file) {
                 if (!$this->fileManagementBusiness->isVideo($file)) {
                     continue;
                 }
 
-                copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode . '/' . $file));
+                copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode.'/'.$file));
                 unlink($tempSubtitle);
 
                 return true;
@@ -133,6 +206,8 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
             copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode));
             unlink($tempSubtitle);
         }
+
+        $this->logger->info('Subtitle applied');
 
         return true;
     }
@@ -144,9 +219,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     public function isVOSTFREpisode($episode)
     {
-        $episodeInfo = pathinfo($episode);
-
-        return strpos($this->slugify($episodeInfo['filename']), 'vostfr') !== false;
+        return strpos($this->fileManagementBusiness->slugify(pathinfo($episode, PATHINFO_FILENAME)), 'vostfr') !== false;
     }
 
     /**
@@ -163,22 +236,11 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         $data = curl_exec($curlSession);
         curl_close($curlSession);
 
-        file_put_contents('/tmp/' . $subtitleLabel, $data);
+        file_put_contents('/tmp/'.$subtitleLabel, $data);
 
-        return '/tmp/' . $subtitleLabel;
+        return '/tmp/'.$subtitleLabel;
     }
 
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function isZip($file)
-    {
-        $filePathInfo = pathinfo($file);
-
-        return in_array($filePathInfo['extension'], ['zip']);
-    }
 
     /**
      * @param string $episode
@@ -189,27 +251,12 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     {
         $episodePathInfo = pathinfo($episode);
 
-        return $episodePathInfo['dirname'] . '/' . $episodePathInfo['filename'] . self::SUBTITLE_EXTENSION;
+        return $episodePathInfo['dirname'].'/'.$episodePathInfo['filename'].self::SUBTITLE_EXTENSION;
     }
 
     /**
-     * @param $text
+     * Return the best subtitle based on its team
      *
-     * @return mixed|string
-     */
-    private function slugify($text)
-    {
-        $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
-        $text = trim($text, '-');
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-        $text = strtolower($text);
-        $text = preg_replace('~[^-\w]+~', '', $text);
-        $text = str_replace('-', '.', $text);
-
-        return (empty($text)) ? null : $text;
-    }
-
-    /**
      * @param stdClass[] $subtitles
      * @param string     $episodeName
      *
@@ -225,16 +272,30 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
 
         foreach ($subtitles as $subtitle) {
             // ToDo (ndreux - 2015-08-31) Manage zip
-            if ($this->isZip($subtitle->file)) {
+            if ($this->fileManagementBusiness->isZip($subtitle->file)) {
                 continue;
             }
 
-            if (strpos($this->slugify($subtitle->file), $team) !== false) {
+            if (strpos($this->fileManagementBusiness->slugify($subtitle->file), $team) !== false) {
                 return $subtitle;
             }
         }
 
         return;
+    }
+
+    /**
+     * @return array
+     */
+    private static function getAvailableTeams()
+    {
+        return array_map(
+            'strtolower',
+            [
+                'KILLERS', 'ASAP', 'LOL', 'FoV', 'YIFY', 'IMMERSE', '0-sec', 'DIMENSION', 'fastsub', 'RIVER', 'tla',
+                'BATV', '2HD', 'FGT', 'QCF', 'DEFiNE', 'TASTETV', 'FQM', 'FEVER', '0TV', 'EVOLVE', 'SNEAkY',
+            ]
+        );
     }
 
     /**
@@ -244,8 +305,8 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     private function getEpisodeTeam($episodeName)
     {
-        $episodeInfo = pathinfo($episodeName);
-        $explodedEpisodeName = explode('.', $this->slugify($episodeInfo['filename']));
+        $episodeInfo         = pathinfo($episodeName);
+        $explodedEpisodeName = explode('.', $this->fileManagementBusiness->slugify($episodeInfo['filename']));
 
         foreach ($explodedEpisodeName as $episodeNamePart) {
             if (in_array($episodeNamePart, self::getAvailableTeams())) {
@@ -257,6 +318,8 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     }
 
     /**
+     * Return the best subtitle based on its quality
+     *
      * @param stdClass[] $subtitles
      *
      * @return null|stdClass
@@ -268,7 +331,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         foreach ($subtitles as $subtitle) {
 
             // ToDo (ndreux - 2015-08-31) Manage zip
-            if ($this->isZip($subtitle->file)) {
+            if ($this->fileManagementBusiness->isZip($subtitle->file)) {
                 continue;
             }
 
@@ -281,22 +344,30 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
     }
 
     /**
-     * @param string $file
+     * Return the subtitles for the episode identified by the given id
      *
-     * @return bool
+     * @param int $id Episode id
+     *
+     * @return stdClass
+     * @throws \Exception
      */
-    public function isVideo($file)
+    public function getSubtitlesByEpisodeId($id)
     {
-        return $this->fileManagementBusiness->isVideo($file);
+        $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($id);
+        $this->logger->info(count($subtitles->subtitles).' found');
+
+        return $subtitles;
     }
 
-    public function getEpisodeData($episode)
+    /**
+     * Return a list of show contained in the given $showPath
+     *
+     * @param string $showPath
+     *
+     * @return string[]
+     */
+    public function getList($showPath)
     {
-        return $this->apiWrapper->getEpisodeData($episode);
-    }
-
-    public function getSubtitleByEpisodeId($id)
-    {
-        return $this->apiWrapper->getSubtitleByEpisodeId($id);
+        return $this->fileManagementBusiness->scandir($showPath);
     }
 }
