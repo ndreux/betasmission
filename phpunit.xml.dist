@@ -31,9 +31,6 @@
 
     <logging>
         <log type="coverage-clover" target="./var/coverage/coverage.xml"/>
+        <log type="coverage-clover" target="./var/coverage/coverage.html"/>
     </logging>
-
-    <php>
-        <env name="env" value="DEV"/>
-    </php>
 </phpunit>

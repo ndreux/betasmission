@@ -4,6 +4,7 @@ namespace src\BetasMission\Tests\Command;
 
 use BetasMissionBundle\Command\DownloadSubtitleCommand;
 use PHPUnit_Framework_TestCase;
+use Symfony\Component\Process\Process;
 
 /**
  * Class DownloadSubtitleCommandTest
@@ -66,7 +67,8 @@ class DownloadSubtitleCommandTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists($this->from.'A Developer\'s Life/A.developer\'s.Life.S01E01.mp4');
         $this->assertFileNotExists($this->from.'A Developer\'s Life/A.developer\'s.Life.S01E01.srt');
 
-        (new DownloadSubtitleCommand($this->from))->execute();
+        $process = new Process(sprintf('php bin/console betasmission:subtitle %s', $this->from));
+        $process->run();
 
         $this->assertFileExists($this->from.'Suits/Suits.S01E01.KILLERS.mp4');
         $this->assertFileExists($this->from.'Suits/Suits.S01E01.KILLERS.srt');
