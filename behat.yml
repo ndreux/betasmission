@@ -17,3 +17,9 @@ default:
                 - "%paths.base%/tests/BetasMissionBundle/Features/Move"
             contexts:
                 - Tests\BetasMissionBundle\Features\Context\MoveContext
+
+        Remove:
+            paths:
+                - "%paths.base%/tests/BetasMissionBundle/Features/Remove"
+            contexts:
+                - Tests\BetasMissionBundle\Features\Context\RemoveContext
