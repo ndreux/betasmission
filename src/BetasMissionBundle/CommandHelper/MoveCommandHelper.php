@@ -4,32 +4,16 @@ namespace BetasMissionBundle\CommandHelper;
 
 use BetasMissionBundle\Business\FileManagementBusiness;
 use BetasMissionBundle\Helper\BetaseriesApiWrapper;
-use BetasMissionBundle\Helper\Logger;
 use BetasMissionBundle\Helper\TraktTvApiWrapper;
 use Exception;
 use stdClass;
+use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class MoveCommandHelper
  */
-class MoveCommandHelper extends AbstractCommandHelper
+class MoveCommandHelper
 {
-
-    /**
-     * @var string
-     */
-    private $from;
-
-    /**
-     * @var string
-     */
-    private $destination;
-
-    /**
-     * @var string
-     */
-    private $defaultDestination;
-
     /**
      * @var FileManagementBusiness
      */
@@ -47,22 +31,37 @@ class MoveCommandHelper extends AbstractCommandHelper
 
     /**
      * MoveCommandHelper constructor.
-     *
-     * @param string $from
-     * @param string $destination
-     * @param string $defaultDestination
      */
-    public function __construct(Logger $logger, $from, $destination, $defaultDestination)
+    public function __construct(Logger $logger)
     {
-        parent::__construct($logger);
+        $this->logger                 = $logger;
         $this->fileManagementBusiness = new FileManagementBusiness($logger);
 
         $this->betaseriesApiWrapper = new BetaseriesApiWrapper();
         $this->traktTvApiWrapper    = new TraktTvApiWrapper();
+    }
 
-        $this->from               = $from;
-        $this->destination        = $destination;
-        $this->defaultDestination = $defaultDestination;
+    public function organize($from, $destination, $defaultDestination)
+    {
+        $episodes = array_diff(scandir($from), ['..', '.']);
+
+        foreach ($episodes as $episode) {
+
+            $this->logger->info('File : '.$episode);
+
+            try {
+                $episodeData     = $this->betaseriesApiWrapper->getEpisodeData($episode);
+                $destinationPath = $this->getTVShowDestinationPath($destination, $defaultDestination, $episodeData);
+            }
+            catch (\Exception $e) {
+                $this->logger->info('The episode has not been found.');
+                $destinationPath = $defaultDestination;
+            }
+
+            if ($this->moveShow($from, $episode, $destinationPath) && isset($episodeData)) {
+                $this->markAsDownloaded($episodeData);
+            }
+        }
     }
 
     /**
@@ -73,9 +72,9 @@ class MoveCommandHelper extends AbstractCommandHelper
      *
      * @return bool
      */
-    public function moveShow($episode, $destinationPath)
+    private function moveShow($from, $episode, $destinationPath)
     {
-        $from = $this->from.'/'.$episode;
+        $from .= '/'.$episode;
 
         $this->fileManagementBusiness->copy($from, $destinationPath.'/'.$episode);
         $this->fileManagementBusiness->remove($from);
@@ -83,20 +82,28 @@ class MoveCommandHelper extends AbstractCommandHelper
         return true;
     }
 
+
     /**
      * Return the destination path of the given TV Show
      *
-     * @param string $showLabel
+     * @param string   $destination
+     * @param string   $defaultDestination
+     * @param stdClass $episodeData
      *
      * @return string
      */
-    public function getTVShowDestinationPath($showLabel)
+    private function getTVShowDestinationPath($destination, $defaultDestination, $episodeData)
     {
-        if (!is_dir($this->destination.'/'.$showLabel)) {
-            mkdir($this->destination.'/'.$showLabel, 0777, true);
+        if (empty($episodeData->episode->show->title)) {
+            return $defaultDestination;
         }
 
-        return $this->destination.'/'.$showLabel;
+        $showLabel = $episodeData->episode->show->title;
+        if (!is_dir($destination.'/'.$showLabel)) {
+            mkdir($destination.'/'.$showLabel, 0777, true);
+        }
+
+        return $destination.'/'.$showLabel;
     }
 
     /**
@@ -104,20 +111,22 @@ class MoveCommandHelper extends AbstractCommandHelper
      *
      * @return void
      */
-    public function markAsDownloaded($episodeData)
+    private function markAsDownloaded($episodeData)
     {
         try {
             $this->betaseriesApiWrapper->markAsDownloaded($episodeData->episode->id);
-            $this->logger->log('Marked the episode as downloaded');
-        } catch (Exception $e) {
-            $this->logger->log('The user does dot watch this show.');
+            $this->logger->info('Marked the episode as downloaded');
+        }
+        catch (Exception $e) {
+            $this->logger->info('The user does dot watch this show.');
         }
 
         try {
             $this->traktTvApiWrapper->markAsDownloaded($episodeData->episode->thetvdb_id);
-            $this->logger->log('Marked the episode as downloaded');
-        } catch (Exception $e) {
-            $this->logger->log('The user does dot watch this show.');
+            $this->logger->info('Marked the episode as downloaded');
+        }
+        catch (Exception $e) {
+            $this->logger->info('The user does dot watch this show.');
         }
     }
 }

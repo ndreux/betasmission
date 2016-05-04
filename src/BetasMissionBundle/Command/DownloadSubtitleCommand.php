@@ -46,6 +46,5 @@ class DownloadSubtitleCommand extends ContainerAwareCommand
 
         $commandHelper = new DownloadSubtitleCommandHelper($logger);
         $commandHelper->downloadSubtitles($from);
-
     }
 }

@@ -27,11 +27,14 @@ class FileManagementBusiness
      */
     public function copy($src, $dst)
     {
+        if (!is_dir(pathinfo($dst, PATHINFO_DIRNAME))) {
+            mkdir(pathinfo($dst, PATHINFO_DIRNAME));
+        }
+
         if (is_file($src)) {
             copy($src, $dst);
         } else {
             $dir = opendir($src);
-            mkdir($dst);
             while (false !== ($file = readdir($dir))) {
                 if (($file != '.') && ($file != '..')) {
                     if (is_dir($src.'/'.$file)) {

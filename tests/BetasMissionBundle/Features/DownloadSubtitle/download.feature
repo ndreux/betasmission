@@ -2,16 +2,13 @@ Feature: Download the subtitles for all the shows
 
   Scenario Outline: I run the download subtitle command
     When I create the following file
-      | name | <fileName> | <withSubtitle> |
-    And I run the command "<betasmission:subtitle>"
+      | <fileName> | <withSubtitle> |
+    And I run the command "betasmission:subtitle" with the parameters "/tmp/betasmission"
     Then I should have the following results
-      | name               | <fileName>           |
-      | shouldHaveSubtitle | <shouldHaveSubtitle> |
+      | <fileName> | <shouldHaveSubtitle> |
 
     Examples:
-      | fileName | withSubtitle | betasmission:subtitle | shouldHaveSubtitle |
-
-
-  Scenario: I run the check-orphan-command with no lock files
-    When I run the command "<betasmission:check-orphan-lock>" with remaining lock files
-    Then An email should be sent
+      | fileName                                         | withSubtitle | shouldHaveSubtitle |
+      | /tmp/betasmission/Test/test.s01e01.killers.mp4   | false        | false              |
+      | /tmp/betasmission/Suits/Suits.s01e01.killers.mp4 | false        | true               |
+      | /tmp/betasmission/Suits/Suits.s01e02.killers.mp4 | true         | true               |
