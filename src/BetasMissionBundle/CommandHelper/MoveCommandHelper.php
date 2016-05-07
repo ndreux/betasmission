@@ -43,7 +43,7 @@ class MoveCommandHelper
 
     public function organize($from, $destination, $defaultDestination)
     {
-        $episodes = array_diff(scandir($from), ['..', '.']);
+        $episodes = $this->fileManagementBusiness->scandir($from);
 
         foreach ($episodes as $episode) {
 

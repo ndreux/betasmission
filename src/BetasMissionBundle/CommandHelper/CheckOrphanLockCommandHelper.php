@@ -5,9 +5,9 @@ namespace BetasMissionBundle\CommandHelper;
 
 use BetasMissionBundle\Helper\Locker;
 use BetasMissionBundle\Helper\Mailer;
-use BetasMissionBundle\Helper\Logger;
 use BetasMissionBundle\MailType\OrphanLockMessage;
 use DateTime;
+use Symfony\Bridge\Monolog\Logger;
 
 class CheckOrphanLockCommandHelper extends AbstractCommandHelper
 {

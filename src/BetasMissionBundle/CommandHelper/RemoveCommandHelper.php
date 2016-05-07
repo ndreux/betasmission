@@ -56,7 +56,7 @@ class RemoveCommandHelper
      */
     public function removeWatched($from)
     {
-        $shows = array_diff(scandir($from), ['..', '.']);
+        $shows = $this->fileManagementBusiness->scandir($from);
 
         $this->logger->info(count($shows).' found');
 
@@ -68,7 +68,7 @@ class RemoveCommandHelper
                 continue;
             }
 
-            $episodes = array_diff(scandir($from.'/'.$show), ['..', '.']);
+            $episodes = $this->fileManagementBusiness->scandir($from.'/'.$show);
 
             foreach ($episodes as $i => $episode) {
                 $episodeCount = count($episodes);
@@ -120,7 +120,12 @@ class RemoveCommandHelper
      */
     private function removeFromCollection($thetvdbId)
     {
-        $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
+        try {
+            $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
+        }
+        catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 
     /**
@@ -159,7 +164,14 @@ class RemoveCommandHelper
      */
     private function hasEpisodeBeenSeen($traktTvId)
     {
-        return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
+        try {
+            return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
+        }
+        catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+
+            return false;
+        }
     }
 
 

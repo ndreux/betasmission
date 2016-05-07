@@ -4,7 +4,7 @@ namespace BetasMissionBundle\Command;
 
 use BetasMissionBundle\Helper\BetaseriesApiWrapper;
 use BetasMissionBundle\Helper\Locker;
-use BetasMissionBundle\Helper\Logger;
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 /**
@@ -47,12 +47,12 @@ abstract class AbstractCommand extends ContainerAwareCommand
     public function preExecute()
     {
         if ($this->locker->isLocked()) {
-            $this->logger->log('The script is locked.');
+            $this->logger->info('The script is locked.');
 
             return false;
         }
 
-        $this->logger->log('Lock');
+        $this->logger->info('Lock');
         $this->locker->lock();
 
         return true;
@@ -63,7 +63,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
      */
     public function postExecute()
     {
-        $this->logger->log('Unlock');
+        $this->logger->info('Unlock');
 
         return $this->locker->unlock();
     }
