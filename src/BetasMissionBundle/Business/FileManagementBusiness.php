@@ -27,11 +27,10 @@ class FileManagementBusiness
      */
     public function copy($src, $dst)
     {
-        if (!is_dir(pathinfo($dst, PATHINFO_DIRNAME))) {
-            mkdir(pathinfo($dst, PATHINFO_DIRNAME));
-        }
-
         if (is_file($src)) {
+            if (!is_dir(pathinfo($dst, PATHINFO_DIRNAME))) {
+                mkdir(pathinfo($dst, PATHINFO_DIRNAME), 077, true);
+            }
             copy($src, $dst);
         } else {
             $dir = opendir($src);
@@ -40,6 +39,9 @@ class FileManagementBusiness
                     if (is_dir($src.'/'.$file)) {
                         $this->copy($src.'/'.$file, $dst.'/'.$file);
                     } else {
+                        if (!is_dir($dst)) {
+                            mkdir($dst, 0777, true);
+                        }
                         $this->logger->info('Copy : '.$src.'/'.$file.' to '.$dst.'/'.$file);
                         copy($src.'/'.$file, $dst.'/'.$file);
                     }
