@@ -31,9 +31,12 @@ class MailerTest extends PHPUnit_Framework_TestCase
         rmdir('/tmp/betasmission');
     }
 
+    /**
+     * 
+     */
     public function testSendOrphanLockMessage()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer('osaxis20@gmail.com', '9YP-N77-kHe-twt');
         $result = $mailer->send((new OrphanLockMessage((new Locker())->getLockFile(), new DateTime()))->getMessage());
 
         $this->assertEquals(1, $result);

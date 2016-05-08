@@ -1,4 +1,5 @@
 services:
     betasmission.mailer:
         class: BetasMissionBundle\Helper\Mailer
+        arguments: ["%mailer_user%", "%mailer_password%"]
 

@@ -11,6 +11,29 @@ use Swift_Mime_SimpleMimeEntity;
 class Mailer
 {
     /**
+     * @var string
+     */
+    private $user;
+
+    /**
+     * @var string
+     */
+    private $password;
+
+    /**
+     * Mailer constructor.
+     *
+     * @param string $user
+     * @param string $password
+     */
+    public function __construct($user, $password)
+    {
+        $this->user     = $user;
+        $this->password = $password;
+    }
+
+
+    /**
      * @param Swift_Mime_SimpleMimeEntity $message
      *
      * @return int
@@ -20,6 +43,7 @@ class Mailer
         if ($this->isTestEnv()) {
             return 1;
         }
+
         return $this->getSwiftMailerInstance()->send($message);
     }
 
@@ -29,8 +53,8 @@ class Mailer
     private function getSwiftMailerInstance()
     {
         $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
-            ->setUsername('osaxis20@gmail.com')
-            ->setPassword('admin#osaxis');
+            ->setUsername($this->user)
+            ->setPassword($this->password);
 
         return new \Swift_Mailer($transport);
     }

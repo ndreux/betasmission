@@ -3,19 +3,9 @@
 namespace Tests\BetasMissionBundle\Features\Context;
 
 use AppKernel;
-use Behat\Behat\Context\Context;
-use Behat\Behat\Context\SnippetAcceptingContext;
-use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Process\Process;
 
-class CheckOrphanLockContext extends WebTestCase implements Context, SnippetAcceptingContext
+class CheckOrphanLockContext extends AbstractCommandContext
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
     /**
      * @When /^I run the command "(.*)" with remaining lock files$/
      */
@@ -23,16 +13,30 @@ class CheckOrphanLockContext extends WebTestCase implements Context, SnippetAcce
     {
         static::bootKernel();
 
-        $this->client = static::createClient();
-        
+        $this->client = $this->getClient();
 
         touch('/tmp/betasmission-move.lock', time() - 4000);
 
         $this->mockMailer();
         $this->client->getContainer()->get('betasmission.mailer')->expects($this->exactly(1))->method('send');
+        
+        $this->iRunTheCommand($arg1);
+        unlink('/tmp/betasmission-move.lock');
+    }
 
-        $process = new Process('php app/console '.$arg1.' --env='.static::$kernel->getEnvironment());
-        $process->run();
+    /**
+     * @When /^I run the command "(.*)" without remaining lock files$/
+     */
+    public function iRunTheCommandWithoutRemainingLockFiles($arg1)
+    {
+        static::bootKernel();
+
+        $this->client = static::createClient();
+
+        $this->mockMailer();
+        $this->client->getContainer()->get('betasmission.mailer')->expects($this->exactly(0))->method('send');
+
+        $this->iRunTheCommand($arg1);
     }
 
     /**
@@ -42,17 +46,33 @@ class CheckOrphanLockContext extends WebTestCase implements Context, SnippetAcce
     {
     }
 
+    /**
+     * @param array $options
+     *
+     * @return AppKernel
+     */
     protected static function createKernel(array $options = [])
     {
         return new AppKernel('test', false);
     }
 
+    /**
+     * Mock Mailer
+     */
     private function mockMailer()
     {
         $mailer = $this->getMockBuilder('BetasMissionBundle\Helper\Mailer')
+            ->disableOriginalConstructor()
             ->setMethods(null)
             ->getMock();
 
         $this->client->getContainer()->set('betasmission.mailer', $mailer);
+    }
+
+    /**
+     * @Then /^No email should be sent$/
+     */
+    public function noEmailShouldBeSent()
+    {
     }
 }

@@ -13,7 +13,7 @@ abstract class AbstractCommandContext extends CommandTestCase implements Context
      */
     public function iRunTheCommand($arg1)
     {
-        $this->client = self::createClient();
+        $this->client = $this->getClient();
         $this->runCommand($this->client, $arg1);
     }
 
@@ -22,7 +22,7 @@ abstract class AbstractCommandContext extends CommandTestCase implements Context
      */
     public function iRunTheCommandWithTheParameters($command, $parameters)
     {
-        $this->client           = self::createClient();
+        $this->client           = $this->getClient();
         static::$createdFiles[] = $parameters;
         $this->runCommand($this->client, $command.' '.$parameters);
     }
@@ -39,8 +39,22 @@ abstract class AbstractCommandContext extends CommandTestCase implements Context
             $command .= sprintf(' --%s %s', $parameter, $value);
             static::$createdFiles[] = $value;
         }
-        
-        $this->client = self::createClient();
+
+        $this->client = $this->getClient();
         $this->runCommand($this->client, $command);
+    }
+
+    /**
+     * Init client if not existing
+     *
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
+    protected function getClient()
+    {
+        if ($this->client === null) {
+            $this->client = self::createClient();
+        }
+
+        return $this->client;
     }
 }
