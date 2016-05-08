@@ -29,7 +29,7 @@ class FileManagementBusiness
     {
         if (is_file($src)) {
             if (!is_dir(pathinfo($dst, PATHINFO_DIRNAME))) {
-                mkdir(pathinfo($dst, PATHINFO_DIRNAME), 077, true);
+                mkdir(pathinfo($dst, PATHINFO_DIRNAME), 0777, true);
             }
             copy($src, $dst);
         } else {
