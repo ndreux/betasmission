@@ -7,6 +7,7 @@ use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\LockHandler;
 
 /**
  * Class RemoveWatchedCommand.
@@ -40,9 +41,11 @@ class RemoveWatchedCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
         $logger = $this->getContainer()->get('logger');
-        if ($this->isLocked()) {
+        $lockHandler = new LockHandler('remove.lock');
+        if (!$lockHandler->lock()) {
             $logger->info('Script locked');
-            return 1;
+
+            return 0;
         }
         
         $from = $input->getArgument('from');

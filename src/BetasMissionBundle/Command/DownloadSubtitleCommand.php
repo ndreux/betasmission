@@ -7,6 +7,7 @@ use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\LockHandler;
 
 /**
  * Class DownloadSubtitleCommand
@@ -41,10 +42,11 @@ class DownloadSubtitleCommand extends AbstractCommand
     {
         $logger = $this->getContainer()->get('logger');
 
-        if ($this->isLocked()) {
+        $lockHandler = new LockHandler('subtitle.lock');
+        if (!$lockHandler->lock()) {
             $logger->info('Script locked');
 
-            return 1;
+            return 0;
         }
         
         $from          = $input->getArgument('from');

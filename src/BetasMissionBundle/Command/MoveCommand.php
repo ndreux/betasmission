@@ -7,6 +7,7 @@ use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\LockHandler;
 
 /**
  * Class MoveCommand.
@@ -51,11 +52,13 @@ class MoveCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
         $logger = $this->getContainer()->get('logger');
-        if ($this->isLocked()) {
+        $lockHandler = new LockHandler('move.lock');
+        if (!$lockHandler->lock()) {
             $logger->info('Script locked');
-            return 1;
+
+            return 0;
         }
-        
+        $logger->info('Script locked');
         $from               = $input->getOption('from');
         $destination        = $input->getOption('destination');
         $defaultDestination = $input->getOption('default-destination');
