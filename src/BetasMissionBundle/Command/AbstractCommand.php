@@ -2,10 +2,7 @@
 
 namespace BetasMissionBundle\Command;
 
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\LockHandler;
 
 /**
@@ -17,17 +14,11 @@ abstract class AbstractCommand extends ContainerAwareCommand
     const ROOT_CONTEXT = 'betasmission';
 
     /**
-     * @var Logger
+     * @return bool
      */
-    protected $logger;
-
-    public function initialize(InputInterface $input, OutputInterface $output)
+    protected function isLocked()
     {
-        parent::initialize($input, $output);
-        
-        $lockHandler = new LockHandler(self::ROOT_CONTEXT.self::CONTEXT);
-        if (!$lockHandler->lock()) {
-            $this->logger->info('Script locked');
-        }
+        $lockHandler = new LockHandler(static::ROOT_CONTEXT.static::CONTEXT);
+        return (!$lockHandler->lock());
     }
 }

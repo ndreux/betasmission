@@ -50,11 +50,19 @@ class MoveCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
+        $logger = $this->getContainer()->get('logger');
+        if ($this->isLocked()) {
+            $logger->info('Script locked');
+            return 1;
+        }
+        
         $from               = $input->getOption('from');
         $destination        = $input->getOption('destination');
         $defaultDestination = $input->getOption('default-destination');
 
-        $commandHelper = new MoveCommandHelper($this->getContainer()->get('logger'));
+        $commandHelper = new MoveCommandHelper($logger);
         $commandHelper->organize($from, $destination, $defaultDestination);
+        
+        return 0;
     }
 }

@@ -39,9 +39,17 @@ class RemoveWatchedCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
+        $logger = $this->getContainer()->get('logger');
+        if ($this->isLocked()) {
+            $logger->info('Script locked');
+            return 1;
+        }
+        
         $from = $input->getArgument('from');
         
-        $commandHelper = new RemoveCommandHelper($this->getContainer()->get('logger'));
+        $commandHelper = new RemoveCommandHelper($logger);
         $commandHelper->removeWatched($from);
+        
+        return 0;
     }
 }

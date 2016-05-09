@@ -39,10 +39,18 @@ class DownloadSubtitleCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $from   = $input->getArgument('from');
         $logger = $this->getContainer()->get('logger');
 
+        if ($this->isLocked()) {
+            $logger->info('Script locked');
+
+            return 1;
+        }
+        
+        $from          = $input->getArgument('from');
         $commandHelper = new DownloadSubtitleCommandHelper($logger);
         $commandHelper->downloadSubtitles($from);
+
+        return 0;
     }
 }
