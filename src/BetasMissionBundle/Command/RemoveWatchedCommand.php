@@ -52,6 +52,8 @@ class RemoveWatchedCommand extends AbstractCommand
         
         $commandHelper = new RemoveCommandHelper($logger);
         $commandHelper->removeWatched($from);
+
+        $lockHandler->release();
         
         return 0;
     }

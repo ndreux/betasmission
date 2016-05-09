@@ -53,6 +53,8 @@ class DownloadSubtitleCommand extends AbstractCommand
         $commandHelper = new DownloadSubtitleCommandHelper($logger);
         $commandHelper->downloadSubtitles($from);
 
+        $lockHandler->release();
+
         return 0;
     }
 }

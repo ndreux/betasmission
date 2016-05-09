@@ -53,11 +53,13 @@ class MoveCommand extends AbstractCommand
     {
         $logger = $this->getContainer()->get('logger');
         $lockHandler = new LockHandler('move.lock');
+        
         if (!$lockHandler->lock()) {
             $logger->info('Script locked');
 
             return 0;
         }
+        
         $logger->info('Script locked');
         $from               = $input->getOption('from');
         $destination        = $input->getOption('destination');
@@ -65,6 +67,8 @@ class MoveCommand extends AbstractCommand
 
         $commandHelper = new MoveCommandHelper($logger);
         $commandHelper->organize($from, $destination, $defaultDestination);
+        
+        $lockHandler->release();
         
         return 0;
     }
