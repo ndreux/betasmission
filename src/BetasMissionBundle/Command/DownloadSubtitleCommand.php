@@ -4,7 +4,6 @@ namespace BetasMissionBundle\Command;
 
 use BetasMissionBundle\CommandHelper\DownloadSubtitleCommandHelper;
 use BetasMissionBundle\Helper\Context;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,10 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class DownloadSubtitleCommand
  */
-class DownloadSubtitleCommand extends ContainerAwareCommand
+class DownloadSubtitleCommand extends AbstractCommand
 {
     const CONTEXT = Context::CONTEXT_DOWNLOAD_SUBTITLE;
-    const FROM    = '/mnt/smb/Labox/Series/Actives/';
 
     /**
      * Configure

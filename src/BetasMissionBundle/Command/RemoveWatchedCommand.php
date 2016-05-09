@@ -13,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class RemoveWatchedCommand extends AbstractCommand
 {
-    const FROM    = '/mnt/smb/Labox/Series/Actives';
     const CONTEXT = Context::CONTEXT_REMOVE;
 
     /**
