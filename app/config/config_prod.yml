@@ -1,0 +1,30 @@
+imports:
+    - { resource: config.yml }
+
+#framework:
+#    validation:
+#        cache: validator.mapping.cache.doctrine.apc
+#    serializer:
+#        cache: serializer.mapping.cache.doctrine.apc
+
+#doctrine:
+#    orm:
+#        metadata_cache_driver: apc
+#        result_cache_driver: apc
+#        query_cache_driver: apc
+
+monolog:
+    handlers:
+        mail:
+            type:         fingers_crossed
+            action_level: error
+            handler:      buffered
+        buffered:
+            type:    buffer
+            handler: swift
+        swift:
+            type:       swift_mailer
+            from_email: 'nclsdrx@gmail.com'
+            to_email:   'nclsdrx@gmail.com'
+            subject:    An Error Occurred!
+            level:      debug

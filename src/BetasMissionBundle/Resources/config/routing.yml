@@ -1,0 +1,3 @@
+betas_mission_homepage:
+    path:     /
+    defaults: { _controller: BetasMissionBundle:Default:index }

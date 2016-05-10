@@ -1,0 +1,25 @@
+default:
+    suites:
+        CheckOrphanLock:
+            paths:
+                - "%paths.base%/tests/BetasMissionBundle/Features/CheckOrphanLock"
+            contexts:
+                - Tests\BetasMissionBundle\Features\Context\CheckOrphanLockContext
+
+        DownloadSubtitle:
+            paths:
+                - "%paths.base%/tests/BetasMissionBundle/Features/DownloadSubtitle"
+            contexts:
+                - Tests\BetasMissionBundle\Features\Context\DownloadSubtitleContext
+
+        Move:
+            paths:
+                - "%paths.base%/tests/BetasMissionBundle/Features/Move"
+            contexts:
+                - Tests\BetasMissionBundle\Features\Context\MoveContext
+
+        Remove:
+            paths:
+                - "%paths.base%/tests/BetasMissionBundle/Features/Remove"
+            contexts:
+                - Tests\BetasMissionBundle\Features\Context\RemoveContext
