@@ -2,7 +2,6 @@
 
 namespace BetasMissionBundle\Command;
 
-use BetasMissionBundle\CommandHelper\MoveCommandHelper;
 use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,24 +50,24 @@ class MoveCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
-        $logger = $this->getContainer()->get('logger');
+        $logger      = $this->getContainer()->get('logger');
         $lockHandler = new LockHandler('move.lock');
-        
+
         if (!$lockHandler->lock()) {
             $logger->info('Script locked');
 
             return 0;
         }
-        
+
         $from               = $input->getOption('from');
         $destination        = $input->getOption('destination');
         $defaultDestination = $input->getOption('default-destination');
 
-        $commandHelper = new MoveCommandHelper($logger);
+        $commandHelper = $this->getContainer()->get('betasmission.command_helpers.move');
         $commandHelper->organize($from, $destination, $defaultDestination);
-        
+
         $lockHandler->release();
-        
+
         return 0;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
+use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
+use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
 use BetasMissionBundle\Business\FileManagementBusiness;
-use BetasMissionBundle\Helper\BetaseriesApiWrapper;
-use BetasMissionBundle\Helper\TraktTvApiWrapper;
 use Exception;
 use stdClass;
 use Symfony\Bridge\Monolog\Logger;
@@ -14,7 +14,6 @@ use Symfony\Bridge\Monolog\Logger;
  */
 class RemoveCommandHelper
 {
-
     /**
      * @var Logger
      */
@@ -26,27 +25,29 @@ class RemoveCommandHelper
     private $fileManagementBusiness;
 
     /**
-     * @var TraktTvApiWrapper
-     */
-    private $traktTvApiWrapper;
-
-    /**
      * @var BetaseriesApiWrapper
      */
     private $betaseriesApiWrapper;
 
     /**
+     * @var TraktTvApiWrapper
+     */
+    private $traktTvApiWrapper;
+
+    /**
      * RemoveCommandHelper constructor.
      *
-     * @param Logger $logger
+     * @param Logger                 $logger
+     * @param FileManagementBusiness $fileManagementBusiness
+     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
+     * @param TraktTvApiWrapper      $traktTvApiWrapper
      */
-    public function __construct(Logger $logger)
+    public function __construct(Logger $logger, FileManagementBusiness $fileManagementBusiness, BetaseriesApiWrapper $betaseriesApiWrapper, TraktTvApiWrapper $traktTvApiWrapper)
     {
         $this->logger                 = $logger;
-        $this->fileManagementBusiness = new FileManagementBusiness($this->logger);
-        $this->traktTvApiWrapper      = new TraktTvApiWrapper();
-        $this->betaseriesApiWrapper   = new BetaseriesApiWrapper();
-
+        $this->fileManagementBusiness = $fileManagementBusiness;
+        $this->betaseriesApiWrapper   = $betaseriesApiWrapper;
+        $this->traktTvApiWrapper      = $traktTvApiWrapper;
     }
 
     /**
@@ -80,8 +81,7 @@ class RemoveCommandHelper
 
                 try {
                     $episodeData = $this->getEpisodeFromFileName($episode);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $this->logger->info('Episode not found on BetaSeries');
                     continue;
                 }
@@ -90,11 +90,10 @@ class RemoveCommandHelper
                 $this->logger->info('Episode seen : '.($hasBeenSeen ? 'true' : 'false'));
 
                 if ($hasBeenSeen) {
-
                     $this->removeFromCollection($episodeData->episode->ids->tvdb);
                     $this->remove($from.'/'.$show.'/'.$episode);
 
-                    $episodeCount--;
+                    --$episodeCount;
 
                     if ($episodeCount === 0) {
                         $this->logger->info('No more show in Show directory. Remove '.$from.'/'.$show);
@@ -122,8 +121,7 @@ class RemoveCommandHelper
     {
         try {
             $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
     }
@@ -145,8 +143,9 @@ class RemoveCommandHelper
      *
      * @param string $fileName
      *
-     * @return stdClass
      * @throws Exception
+     *
+     * @return stdClass
      */
     private function getEpisodeFromFileName($fileName)
     {
@@ -166,14 +165,12 @@ class RemoveCommandHelper
     {
         try {
             return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
 
             return false;
         }
     }
-
 
     /**
      * @param string $file

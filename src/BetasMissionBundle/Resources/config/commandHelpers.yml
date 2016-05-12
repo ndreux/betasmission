@@ -1,0 +1,24 @@
+services:
+  betasmission.command_helpers.move:
+    class: BetasMissionBundle\CommandHelper\MoveCommandHelper
+    arguments:
+      - "@monolog.logger"
+      - "@betasmission.business.file_management"
+      - "@betasmission.api_wrapper.betaseries"
+      - "@betasmission.api_wrapper.trakt_tv"
+
+  betasmission.command_helpers.subtitle:
+    class: BetasMissionBundle\CommandHelper\DownloadSubtitleCommandHelper
+    arguments:
+      - "@monolog.logger"
+      - "@betasmission.business.file_management"
+      - "@betasmission.api_wrapper.betaseries"
+
+
+  betasmission.command_helpers.remove:
+    class: BetasMissionBundle\CommandHelper\RemoveCommandHelper
+    arguments:
+      - "@monolog.logger"
+      - "@betasmission.business.file_management"
+      - "@betasmission.api_wrapper.betaseries"
+      - "@betasmission.api_wrapper.trakt_tv"

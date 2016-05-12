@@ -2,7 +2,6 @@
 
 namespace BetasMissionBundle\Command;
 
-use BetasMissionBundle\CommandHelper\DownloadSubtitleCommandHelper;
 use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,15 +27,15 @@ class DownloadSubtitleCommand extends AbstractCommand
                 InputArgument::REQUIRED,
                 'TVShow root directory'
             );
-
     }
 
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @return int|null|void
      * @throws \Exception
+     *
+     * @return int|null|void
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -48,9 +47,10 @@ class DownloadSubtitleCommand extends AbstractCommand
 
             return 0;
         }
-        
-        $from          = $input->getArgument('from');
-        $commandHelper = new DownloadSubtitleCommandHelper($logger);
+
+        $from = $input->getArgument('from');
+
+        $commandHelper = $this->getContainer()->get('betasmission.command_helpers.subtitle');
         $commandHelper->downloadSubtitles($from);
 
         $lockHandler->release();

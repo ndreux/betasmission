@@ -2,8 +2,8 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
+use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
 use BetasMissionBundle\Business\FileManagementBusiness;
-use BetasMissionBundle\Helper\BetaseriesApiWrapper;
 use stdClass;
 use Symfony\Bridge\Monolog\Logger;
 
@@ -15,6 +15,11 @@ class DownloadSubtitleCommandHelper
     const SUBTITLE_EXTENSION = '.srt';
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
      * @var FileManagementBusiness
      */
     private $fileManagementBusiness;
@@ -22,18 +27,20 @@ class DownloadSubtitleCommandHelper
     /**
      * @var BetaseriesApiWrapper
      */
-    private $apiWrapper;
+    private $betaseriesApiWrapper;
 
     /**
      * DownloadSubtitleCommandHelper constructor.
      *
-     * @param Logger $logger
+     * @param Logger                 $logger
+     * @param FileManagementBusiness $fileManagementBusiness
+     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
      */
-    public function __construct(Logger $logger)
+    public function __construct(Logger $logger, FileManagementBusiness $fileManagementBusiness, BetaseriesApiWrapper $betaseriesApiWrapper)
     {
         $this->logger                 = $logger;
-        $this->fileManagementBusiness = new FileManagementBusiness($logger);
-        $this->apiWrapper             = new BetaseriesApiWrapper();
+        $this->fileManagementBusiness = $fileManagementBusiness;
+        $this->betaseriesApiWrapper   = $betaseriesApiWrapper;
     }
 
     /**
@@ -82,9 +89,8 @@ class DownloadSubtitleCommandHelper
         }
 
         try {
-            $episodeData = $this->apiWrapper->getEpisodeData($episode);
-        }
-        catch (\Exception $e) {
+            $episodeData = $this->betaseriesApiWrapper->getEpisodeData($episode);
+        } catch (\Exception $e) {
             $this->logger->info('Episode not found on BetaSeries');
 
             return;
@@ -145,7 +151,7 @@ class DownloadSubtitleCommandHelper
             if (!$this->fileManagementBusiness->isVideo($episode)) {
                 $this->logger->info('No video file');
 
-                return null;
+                return;
             }
 
             if (file_exists($this->getSubtitleFileNameFromEpisode($episode))) {
@@ -169,7 +175,7 @@ class DownloadSubtitleCommandHelper
     private function getBestSubtitle($subtitles, $episodeName)
     {
         if (empty($subtitles->subtitles)) {
-            return null;
+            return;
         }
 
         $teamSubtitle = $this->getBestSubtitleByTeam($subtitles->subtitles, $episodeName);
@@ -184,7 +190,7 @@ class DownloadSubtitleCommandHelper
             return $bestQualitySubtitle;
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -255,7 +261,6 @@ class DownloadSubtitleCommandHelper
         return '/tmp/'.$subtitleLabel;
     }
 
-
     /**
      * @param string $episode
      *
@@ -281,7 +286,7 @@ class DownloadSubtitleCommandHelper
         $team = $this->getEpisodeTeam($episodeName);
 
         if ($team === null) {
-            return null;
+            return;
         }
 
         foreach ($subtitles as $subtitle) {
@@ -295,7 +300,7 @@ class DownloadSubtitleCommandHelper
             }
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -328,7 +333,7 @@ class DownloadSubtitleCommandHelper
             }
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -362,12 +367,13 @@ class DownloadSubtitleCommandHelper
      *
      * @param int $id Episode id
      *
-     * @return stdClass
      * @throws \Exception
+     *
+     * @return stdClass
      */
     public function getSubtitlesByEpisodeId($id)
     {
-        $subtitles = $this->apiWrapper->getSubtitleByEpisodeId($id);
+        $subtitles = $this->betaseriesApiWrapper->getSubtitleByEpisodeId($id);
         $this->logger->info(count($subtitles->subtitles).' found');
 
         return $subtitles;

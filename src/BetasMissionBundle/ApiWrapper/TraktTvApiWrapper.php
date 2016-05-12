@@ -1,6 +1,6 @@
 <?php
 
-namespace BetasMissionBundle\Helper;
+namespace BetasMissionBundle\ApiWrapper;
 
 use DateTime;
 use GuzzleHttp\Client;
@@ -11,38 +11,72 @@ use stdClass;
  */
 class TraktTvApiWrapper
 {
-
-    const CLIENT_ID       = 'db4e4c24f7d4bb762e1c0c5858aa6c148fad2c608853c1c46db7a4bca7129259';
-    const CLIENT_SECRET   = 'a97533b54ae9f9be98084888dbc3291b2ecc45088ca6e478d446d32c5fc24794';
-    const APPLICATION_PIN = 'C10C07A0';
-
-    const API_URL = 'https://api-v2launch.trakt.tv';
-
-    const ACCESS_TOKEN  = '30ebaf173e9b06a3e4d9684482a62c947c471c2683ad870d0b1ba5a1beeda0e7';
-    const REFRESH_TOKEN = '8b9818db77c7e9ebf573883446af52a8668df1694ba95629b0455475466ff3e3';
+    /**
+     * @var string
+     */
+    private $clientId;
+    /**
+     * @var string
+     */
+    private $clientSecret;
+    /**
+     * @var string
+     */
+    private $apiBasePath;
+    /**
+     * @var string
+     */
+    private $accessToken;
+    /**
+     * @var string
+     */
+    private $refreshToken;
+    /**
+     * @var string
+     */
+    private $applicationPin;
 
     /**
-     * @return null
+     * TraktTvApiWrapper constructor.
+     *
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $apiBasePath
+     * @param string $accessToken
+     * @param string $refreshToken
+     * @param string $applicationPin
+     */
+    public function __construct($clientId, $clientSecret, $apiBasePath, $accessToken, $refreshToken, $applicationPin)
+    {
+        $this->clientId       = $clientId;
+        $this->clientSecret   = $clientSecret;
+        $this->apiBasePath    = $apiBasePath;
+        $this->accessToken    = $accessToken;
+        $this->refreshToken   = $refreshToken;
+        $this->applicationPin = $applicationPin;
+    }
+
+    /**
      */
     public function authenticate()
     {
         $client   = new Client();
         $response = $client->post(
-            self::API_URL.'/oauth/token',
+            $this->apiBasePath.'/oauth/token',
             [
                 'form_params' => [
-                    'code'          => self::APPLICATION_PIN,
-                    'client_id'     => self::CLIENT_ID,
-                    'client_secret' => self::CLIENT_SECRET,
+                    'code'          => $this->applicationPin,
+                    'client_id'     => $this->clientId,
+                    'client_secret' => $this->clientSecret,
                     'redirect_uri'  => 'urn:ietf:wg:oauth:2.0:oob',
-                    'grant_type'    => 'authorization_code'
-                ]
+                    'grant_type'    => 'authorization_code',
+                ],
             ]
         );
 
         echo $response->getBody()->getContents();
 
-        return null;
+        return;
     }
 
     /**
@@ -51,10 +85,10 @@ class TraktTvApiWrapper
     public function markAsDownloaded($thetvbdId)
     {
         $headers = [
-            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
-            'trakt-api-key'     => self::CLIENT_ID,
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $episode      = new \stdClass();
@@ -62,10 +96,10 @@ class TraktTvApiWrapper
 
         $client = new Client();
         $client->post(
-            self::API_URL.'/sync/collection',
+            $this->apiBasePath.'/sync/collection',
             [
                 'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]])
+                'body'    => json_encode(['episodes' => [$episode]]),
             ]
         );
     }
@@ -77,10 +111,10 @@ class TraktTvApiWrapper
     public function markAsWatched($thetvbdId, $watchedDateTime = null)
     {
         $headers = [
-            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
-            'trakt-api-key'     => self::CLIENT_ID,
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $watchedAt = ($watchedDateTime === null) ? new DateTime() : $watchedDateTime;
@@ -91,10 +125,10 @@ class TraktTvApiWrapper
 
         $client = new Client();
         $client->post(
-            self::API_URL.'/sync/history',
+            $this->apiBasePath.'/sync/history',
             [
                 'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]])
+                'body'    => json_encode(['episodes' => [$episode]]),
             ]
         );
     }
@@ -106,10 +140,10 @@ class TraktTvApiWrapper
     public function removeFromCollection($thetvbdId)
     {
         $headers = [
-            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
-            'trakt-api-key'     => self::CLIENT_ID,
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $episode      = new \stdClass();
@@ -117,10 +151,10 @@ class TraktTvApiWrapper
 
         $client = new Client();
         $client->post(
-            self::API_URL.'/sync/collection/remove',
+            $this->apiBasePath.'/sync/collection/remove',
             [
                 'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]])
+                'body'    => json_encode(['episodes' => [$episode]]),
             ]
         );
     }
@@ -130,16 +164,15 @@ class TraktTvApiWrapper
      */
     public function getCollection()
     {
-
         $headers = [
-            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
-            'trakt-api-key'     => self::CLIENT_ID,
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $client   = new Client();
-        $response = $client->get(self::API_URL.'/sync/collection/shows', ['headers' => $headers]);
+        $response = $client->get($this->apiBasePath.'/sync/collection/shows', ['headers' => $headers]);
 
         return json_decode($response->getBody()->getContents());
     }
@@ -156,7 +189,6 @@ class TraktTvApiWrapper
 
         foreach ($collection as $show) {
             foreach ($show->seasons as $season) {
-
                 if ($season->number != $episodeData->episode->season) {
                     continue;
                 }
@@ -180,17 +212,17 @@ class TraktTvApiWrapper
     public function searchEpisode($tvdbId)
     {
         $headers = [
-            'trakt-api-key'     => self::CLIENT_ID,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $client   = new Client();
         $response = $client->get(
-            self::API_URL.'/search',
+            $this->apiBasePath.'/search',
             [
                 'headers' => $headers,
-                'query'   => ['id_type' => 'tvdb', 'id' => $tvdbId]
+                'query'   => ['id_type' => 'tvdb', 'id' => $tvdbId],
             ]
         );
 
@@ -209,14 +241,14 @@ class TraktTvApiWrapper
     public function hasEpisodeBeenSeen($traktTvId)
     {
         $headers = [
-            'Authorization'     => 'Bearer '.self::ACCESS_TOKEN,
-            'trakt-api-key'     => self::CLIENT_ID,
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
             'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2
+            'trakt-api-version' => 2,
         ];
 
         $client   = new Client();
-        $response = $client->get(sprintf(self::API_URL.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]);
+        $response = $client->get(sprintf($this->apiBasePath.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]);
 
         return !empty(json_decode($response->getBody()->getContents()));
     }

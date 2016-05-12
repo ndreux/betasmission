@@ -1,6 +1,6 @@
 <?php
 
-namespace BetasMissionBundle\Helper;
+namespace BetasMissionBundle\ApiWrapper;
 
 use stdClass;
 
@@ -9,11 +9,6 @@ use stdClass;
  */
 class BetaseriesApiWrapper
 {
-    const API_BASE_PATH = 'https://api.betaseries.com/';
-    const LOGIN         = 'ndreux';
-    const PASSWORD_HASH = '370328edae152a82a8bc0970c9bfb20e';
-    const API_KEY       = 'c8bb2471b101';
-
     /**
      * @var string
      */
@@ -32,7 +27,7 @@ class BetaseriesApiWrapper
     /**
      * @var string
      */
-    private $apiUrl;
+    private $apiBasePath;
 
     /**
      * @var string
@@ -40,17 +35,17 @@ class BetaseriesApiWrapper
     private $token;
 
     /**
-     * @param string $login
-     * @param string $passwordHash
-     * @param string $apiKey
-     * @param string $apiUrl
+     * @param string      $login
+     * @param string      $passwordHash
+     * @param string|null $apiKey
+     * @param string|null $apiBasePath
      */
-    public function __construct($login = self::LOGIN, $passwordHash = self::PASSWORD_HASH, $apiKey = self::API_KEY, $apiUrl = self::API_BASE_PATH)
+    public function __construct($login, $passwordHash, $apiKey, $apiBasePath)
     {
         $this->login        = $login;
-        $this->apiKey       = $apiKey;
         $this->passwordHash = $passwordHash;
-        $this->apiUrl       = $apiUrl;
+        $this->apiKey       = $apiKey;
+        $this->apiBasePath  = $apiBasePath;
     }
 
     /**
@@ -66,8 +61,8 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'file' => $episodeFileName];
-        $searchQuery = $this->apiUrl.'episodes/scraper?'.http_build_query($parameters);
+        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'file' => $episodeFileName];
+        $searchQuery = $this->apiBasePath.'episodes/scraper?'.http_build_query($parameters);
 
         $curlResource = curl_init();
 
@@ -97,8 +92,8 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
-        $searchQuery = $this->apiUrl.'episodes/downloaded';
+        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
+        $searchQuery = $this->apiBasePath.'episodes/downloaded';
 
         $curlResource = curl_init();
 
@@ -130,8 +125,8 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters   = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId];
-        $watchedQuery = $this->apiUrl.'episodes/watched';
+        $parameters   = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
+        $watchedQuery = $this->apiBasePath.'episodes/watched';
 
         $curlResource = curl_init();
 
@@ -164,8 +159,8 @@ class BetaseriesApiWrapper
             $this->authenticate();
         }
 
-        $parameters  = ['token' => $this->token, 'key' => self::API_KEY, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
-        $searchQuery = $this->apiUrl.'subtitles/episode?'.http_build_query($parameters);
+        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
+        $searchQuery = $this->apiBasePath.'subtitles/episode?'.http_build_query($parameters);
 
         $curlResource = curl_init();
 
@@ -189,7 +184,7 @@ class BetaseriesApiWrapper
      */
     private function authenticate()
     {
-        $authenticateUrl = $this->apiUrl.'members/auth';
+        $authenticateUrl = $this->apiBasePath.'members/auth';
         $parameters      = ['login' => $this->login, 'password' => $this->passwordHash, 'key' => $this->apiKey, 'v' => '2.4'];
 
         $curlResource = curl_init();
@@ -211,5 +206,21 @@ class BetaseriesApiWrapper
         $this->token = $apiReturn->token;
 
         return true;
+    }
+
+    /**
+     * @param string $login
+     */
+    public function setLogin($login)
+    {
+        $this->login = $login;
+    }
+
+    /**
+     * @param string $passwordHash
+     */
+    public function setPasswordHash($passwordHash)
+    {
+        $this->passwordHash = $passwordHash;
     }
 }

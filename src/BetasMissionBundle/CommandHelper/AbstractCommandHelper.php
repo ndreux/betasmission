@@ -1,6 +1,7 @@
 <?php
 
 namespace BetasMissionBundle\CommandHelper;
+
 use Symfony\Bridge\Monolog\Logger;
 
 /**

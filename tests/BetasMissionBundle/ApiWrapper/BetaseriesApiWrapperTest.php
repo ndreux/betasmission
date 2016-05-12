@@ -1,22 +1,31 @@
 <?php
 
-namespace BetasMissionBundle\Tests\Helper;
+namespace BetasMissionBundle\Tests\ApiWrapper;
 
-use BetasMissionBundle\Helper\BetaseriesApiWrapper;
+use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
 use Exception;
-use PHPUnit_Framework_TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class BetaseriesApiWrapperTest
  */
-class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
+class BetaseriesApiWrapperTest extends WebTestCase
 {
+    /**
+     * @var BetaseriesApiWrapper
+     */
+    private $apiWrapper;
+
     /**
      * @return void
      */
     protected function setUp()
     {
         parent::setUp();
+
+        static::bootKernel();
+        $this->apiWrapper = static::$kernel->getContainer()->get('betasmission.api_wrapper.betaseries');
+
         mkdir('/tmp/betasmission', 0777, true);
     }
 
@@ -36,10 +45,11 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testGetEpisodeData()
     {
-        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+        $this->apiWrapper->setLogin('Dev034');
+        $this->apiWrapper->setPasswordHash(md5('developer'));
 
         $fileName = 'A.Developers.Life.S01E01.mp4';
-        $result   = $apiWrapper->getEpisodeData($fileName);
+        $result   = $this->apiWrapper->getEpisodeData($fileName);
 
         $this->assertInstanceOf('stdClass', $result);
     }
@@ -54,10 +64,11 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testMarkAsDownloaded()
     {
-        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+        $this->apiWrapper->setLogin('Dev034');
+        $this->apiWrapper->setPasswordHash(md5('developer'));
 
         $episodeId = 348990;
-        $apiWrapper->markAsDownloaded($episodeId);
+        $this->apiWrapper->markAsDownloaded($episodeId);
     }
 
     /**
@@ -70,10 +81,11 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testMarkAsWatchedFail()
     {
-        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+        $this->apiWrapper->setLogin('Dev034');
+        $this->apiWrapper->setPasswordHash(md5('developer'));
 
         $episodeId = 348990;
-        $apiWrapper->markAsWatched($episodeId);
+        $this->apiWrapper->markAsWatched($episodeId);
     }
 
     /**
@@ -81,10 +93,8 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testMarkAsWatched()
     {
-        $apiWrapper = new BetaseriesApiWrapper(BetaseriesApiWrapper::LOGIN, BetaseriesApiWrapper::PASSWORD_HASH);
-
         $episodeId = 203664;
-        $apiWrapper->markAsWatched($episodeId);
+        $this->apiWrapper->markAsWatched($episodeId);
     }
 
     /**
@@ -94,11 +104,12 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testGetSubtitleByEpisodeId()
     {
-        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+        $this->apiWrapper->setLogin('Dev034');
+        $this->apiWrapper->setPasswordHash(md5('developer'));
 
         $episodeId = 348990;
         $language  = 'all';
-        $result    = $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
+        $result    = $this->apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
 
         $this->assertInstanceOf('stdClass', $result);
     }
@@ -112,11 +123,12 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testGetSubtitleByEpisodeIdFail()
     {
-        $apiWrapper = new BetaseriesApiWrapper('Dev034', md5('developer'));
+        $this->apiWrapper->setLogin('Dev034');
+        $this->apiWrapper->setPasswordHash(md5('developer'));
 
         $episodeId = 0;
         $language  = 'all';
-        $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
+        $this->apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
     }
 
     /**
@@ -128,10 +140,11 @@ class BetaseriesApiWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testFailAuthenticate()
     {
-        $apiWrapper = new BetaseriesApiWrapper('ndreux', md5('skldfhsdjklfhfjqlksfsdhf:qk'));
+        $this->apiWrapper->setLogin('ndreux');
+        $this->apiWrapper->setPasswordHash(md5('skldfhsdjklfhfjqlksfsdhf:qk'));
 
         $episodeId = 0;
         $language  = 'all';
-        $apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
+        $this->apiWrapper->getSubtitleByEpisodeId($episodeId, $language);
     }
 }

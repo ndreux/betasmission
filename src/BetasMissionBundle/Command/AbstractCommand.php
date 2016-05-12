@@ -19,6 +19,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
     protected function isLocked()
     {
         $lockHandler = new LockHandler(static::ROOT_CONTEXT.static::CONTEXT);
-        return (!$lockHandler->lock());
+
+        return !$lockHandler->lock();
     }
 }

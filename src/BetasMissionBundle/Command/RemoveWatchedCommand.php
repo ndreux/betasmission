@@ -2,7 +2,6 @@
 
 namespace BetasMissionBundle\Command;
 
-use BetasMissionBundle\CommandHelper\RemoveCommandHelper;
 use BetasMissionBundle\Helper\Context;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +26,7 @@ class RemoveWatchedCommand extends AbstractCommand
                 'from',
                 InputArgument::REQUIRED,
                 'TVShow root directory'
-            );;
+            );
     }
 
     /**
@@ -40,21 +39,21 @@ class RemoveWatchedCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $outputInterface)
     {
-        $logger = $this->getContainer()->get('logger');
+        $logger      = $this->getContainer()->get('logger');
         $lockHandler = new LockHandler('remove.lock');
         if (!$lockHandler->lock()) {
             $logger->info('Script locked');
 
             return 0;
         }
-        
+
         $from = $input->getArgument('from');
-        
-        $commandHelper = new RemoveCommandHelper($logger);
+
+        $commandHelper = $this->getContainer()->get('betasmission.command_helpers.remove');
         $commandHelper->removeWatched($from);
 
         $lockHandler->release();
-        
+
         return 0;
     }
 }

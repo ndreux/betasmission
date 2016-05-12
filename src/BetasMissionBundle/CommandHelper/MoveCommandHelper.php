@@ -2,9 +2,9 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
+use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
+use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
 use BetasMissionBundle\Business\FileManagementBusiness;
-use BetasMissionBundle\Helper\BetaseriesApiWrapper;
-use BetasMissionBundle\Helper\TraktTvApiWrapper;
 use Exception;
 use stdClass;
 use Symfony\Bridge\Monolog\Logger;
@@ -14,6 +14,11 @@ use Symfony\Bridge\Monolog\Logger;
  */
 class MoveCommandHelper
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
     /**
      * @var FileManagementBusiness
      */
@@ -31,14 +36,18 @@ class MoveCommandHelper
 
     /**
      * MoveCommandHelper constructor.
+     *
+     * @param Logger                 $logger
+     * @param FileManagementBusiness $fileManagementBusiness
+     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
+     * @param TraktTvApiWrapper      $traktTvApiWrapper
      */
-    public function __construct(Logger $logger)
+    public function __construct(Logger $logger, FileManagementBusiness $fileManagementBusiness, BetaseriesApiWrapper $betaseriesApiWrapper, TraktTvApiWrapper $traktTvApiWrapper)
     {
         $this->logger                 = $logger;
-        $this->fileManagementBusiness = new FileManagementBusiness($logger);
-
-        $this->betaseriesApiWrapper = new BetaseriesApiWrapper();
-        $this->traktTvApiWrapper    = new TraktTvApiWrapper();
+        $this->fileManagementBusiness = $fileManagementBusiness;
+        $this->betaseriesApiWrapper   = $betaseriesApiWrapper;
+        $this->traktTvApiWrapper      = $traktTvApiWrapper;
     }
 
     public function organize($from, $destination, $defaultDestination)
@@ -46,14 +55,12 @@ class MoveCommandHelper
         $episodes = $this->fileManagementBusiness->scandir($from);
 
         foreach ($episodes as $episode) {
-
             $this->logger->info('File : '.$episode);
 
             try {
                 $episodeData     = $this->betaseriesApiWrapper->getEpisodeData($episode);
                 $destinationPath = $this->getTVShowDestinationPath($destination, $defaultDestination, $episodeData);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->info('The episode has not been found.');
                 $destinationPath = $defaultDestination;
             }
@@ -82,7 +89,6 @@ class MoveCommandHelper
         return true;
     }
 
-
     /**
      * Return the destination path of the given TV Show
      *
@@ -108,24 +114,20 @@ class MoveCommandHelper
 
     /**
      * @param stdClass $episodeData
-     *
-     * @return void
      */
     private function markAsDownloaded($episodeData)
     {
         try {
             $this->betaseriesApiWrapper->markAsDownloaded($episodeData->episode->id);
             $this->logger->info('Marked the episode as downloaded');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->info('The user does dot watch this show.');
         }
 
         try {
             $this->traktTvApiWrapper->markAsDownloaded($episodeData->episode->thetvdb_id);
             $this->logger->info('Marked the episode as downloaded');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->info('The user does dot watch this show.');
         }
     }

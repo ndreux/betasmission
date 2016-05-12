@@ -1,0 +1,4 @@
+services:
+   betasmission.business.file_management:
+      class: BetasMissionBundle\Business\FileManagementBusiness
+      arguments: ["@monolog.logger"]
