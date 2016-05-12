@@ -60,7 +60,6 @@ class MoveCommand extends AbstractCommand
             return 0;
         }
         
-        $logger->info('Script locked');
         $from               = $input->getOption('from');
         $destination        = $input->getOption('destination');
         $defaultDestination = $input->getOption('default-destination');
