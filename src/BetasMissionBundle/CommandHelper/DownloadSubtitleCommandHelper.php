@@ -150,6 +150,8 @@ class DownloadSubtitleCommandHelper
 
             if (file_exists($this->getSubtitleFileNameFromEpisode($episode))) {
                 $this->logger->info('Episode already has a subtitle');
+
+                return true;
             }
 
             return false;
