@@ -115,8 +115,8 @@ class DownloadSubtitleCommandHelper
         $isVOSTFR    = $this->isVOSTFREpisode($showPath.'/'.$episode);
         $hasSubtitle = $this->episodeHasSubtitle($showPath.'/'.$episode);
 
-        if ($isVOSTFR || $hasSubtitle === null || $hasSubtitle === true) {
-            $this->logger->info('VOSTFR Episode. Does not need subtitle');
+        if ($isVOSTFR || $hasSubtitle === true) {
+            $this->logger->info('Does not need subtitle');
 
             return false;
         }
@@ -127,7 +127,7 @@ class DownloadSubtitleCommandHelper
     /**
      * @param string $episode
      *
-     * @return bool
+     * @return bool|null
      */
     private function episodeHasSubtitle($episode)
     {
@@ -143,10 +143,16 @@ class DownloadSubtitleCommandHelper
             return false;
         } else {
             if (!$this->fileManagementBusiness->isVideo($episode)) {
-                return;
+                $this->logger->info('No video file');
+
+                return null;
             }
 
-            return file_exists($this->getSubtitleFileNameFromEpisode($episode));
+            if (file_exists($this->getSubtitleFileNameFromEpisode($episode))) {
+                $this->logger->info('Episode already has a subtitle');
+            }
+
+            return false;
         }
     }
 
@@ -161,7 +167,7 @@ class DownloadSubtitleCommandHelper
     private function getBestSubtitle($subtitles, $episodeName)
     {
         if (empty($subtitles->subtitles)) {
-            return;
+            return null;
         }
 
         $teamSubtitle = $this->getBestSubtitleByTeam($subtitles->subtitles, $episodeName);
@@ -176,7 +182,7 @@ class DownloadSubtitleCommandHelper
             return $bestQualitySubtitle;
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -219,7 +225,13 @@ class DownloadSubtitleCommandHelper
      */
     public function isVOSTFREpisode($episode)
     {
-        return strpos($this->fileManagementBusiness->slugify(pathinfo($episode, PATHINFO_FILENAME)), 'vostfr') !== false;
+        if (strpos($this->fileManagementBusiness->slugify(pathinfo($episode, PATHINFO_FILENAME)), 'vostfr') !== false) {
+            $this->logger->info('VOSTFR Episode');
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -267,7 +279,7 @@ class DownloadSubtitleCommandHelper
         $team = $this->getEpisodeTeam($episodeName);
 
         if ($team === null) {
-            return;
+            return null;
         }
 
         foreach ($subtitles as $subtitle) {
@@ -281,7 +293,7 @@ class DownloadSubtitleCommandHelper
             }
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -314,7 +326,7 @@ class DownloadSubtitleCommandHelper
             }
         }
 
-        return;
+        return null;
     }
 
     /**
