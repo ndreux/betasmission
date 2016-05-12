@@ -37,6 +37,11 @@ class TraktTvApiWrapper
     private $applicationPin;
 
     /**
+     * @var stdClass[]
+     */
+    private $collection;
+
+    /**
      * TraktTvApiWrapper constructor.
      *
      * @param string $clientId
@@ -164,6 +169,10 @@ class TraktTvApiWrapper
      */
     public function getCollection()
     {
+        if (!empty($this->collection)) {
+            return $this->collection;
+        }
+
         $headers = [
             'Authorization'     => 'Bearer '.$this->accessToken,
             'trakt-api-key'     => $this->clientId,
@@ -174,7 +183,9 @@ class TraktTvApiWrapper
         $client   = new Client();
         $response = $client->get($this->apiBasePath.'/sync/collection/shows', ['headers' => $headers]);
 
-        return json_decode($response->getBody()->getContents());
+        $this->collection = json_decode($response->getBody()->getContents());
+
+        return $this->collection;
     }
 
     /**
