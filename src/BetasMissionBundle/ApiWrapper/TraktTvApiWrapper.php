@@ -9,33 +9,8 @@ use stdClass;
 /**
  * Class TraktTvApiWrapper
  */
-class TraktTvApiWrapper
+class TraktTvApiWrapper extends AbstractApiWrapper
 {
-    /**
-     * @var string
-     */
-    private $clientId;
-    /**
-     * @var string
-     */
-    private $clientSecret;
-    /**
-     * @var string
-     */
-    private $apiBasePath;
-    /**
-     * @var string
-     */
-    private $accessToken;
-    /**
-     * @var string
-     */
-    private $refreshToken;
-    /**
-     * @var string
-     */
-    private $applicationPin;
-
     /**
      * @var stdClass[]
      */
@@ -99,8 +74,8 @@ class TraktTvApiWrapper
         $episode      = new \stdClass();
         $episode->ids = ['tvdb' => $thetvbdId];
 
-        $client = new Client();
-        $client->post(
+        $this->query(
+            self::HTTP_POST,
             $this->apiBasePath.'/sync/collection',
             [
                 'headers' => $headers,
@@ -128,8 +103,8 @@ class TraktTvApiWrapper
         $episode->ids        = ['tvdb' => $thetvbdId];
         $episode->watched_at = $watchedAt->format('Y-m-dTH:i:s');
 
-        $client = new Client();
-        $client->post(
+        $this->query(
+            self::HTTP_POST,
             $this->apiBasePath.'/sync/history',
             [
                 'headers' => $headers,
@@ -154,8 +129,7 @@ class TraktTvApiWrapper
         $episode      = new \stdClass();
         $episode->ids = ['tvdb' => $thetvbdId];
 
-        $client = new Client();
-        $client->post(
+        $this->query(self::HTTP_POST,
             $this->apiBasePath.'/sync/collection/remove',
             [
                 'headers' => $headers,
@@ -180,10 +154,7 @@ class TraktTvApiWrapper
             'trakt-api-version' => 2,
         ];
 
-        $client   = new Client();
-        $response = $client->get($this->apiBasePath.'/sync/collection/shows', ['headers' => $headers]);
-
-        $this->collection = json_decode($response->getBody()->getContents());
+        $this->collection = $this->query(self::HTTP_GET, $this->apiBasePath.'/sync/collection/shows', ['headers' => $headers]);
 
         return $this->collection;
     }
@@ -228,16 +199,12 @@ class TraktTvApiWrapper
             'trakt-api-version' => 2,
         ];
 
-        $client   = new Client();
-        $response = $client->get(
-            $this->apiBasePath.'/search',
-            [
-                'headers' => $headers,
-                'query'   => ['id_type' => 'tvdb', 'id' => $tvdbId],
-            ]
-        );
+        $options = [
+            'headers' => $headers,
+            'query'   => ['id_type' => 'tvdb', 'id' => $tvdbId],
+        ];
 
-        $response = json_decode($response->getBody()->getContents());
+        $response = $this->query(self::HTTP_GET, $this->apiBasePath.'/search', $options);
 
         return array_shift($response);
     }
@@ -258,9 +225,6 @@ class TraktTvApiWrapper
             'trakt-api-version' => 2,
         ];
 
-        $client   = new Client();
-        $response = $client->get(sprintf($this->apiBasePath.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]);
-
-        return !empty(json_decode($response->getBody()->getContents()));
+        return !empty($this->query(self::HTTP_GET, sprintf($this->apiBasePath.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]));
     }
 }
