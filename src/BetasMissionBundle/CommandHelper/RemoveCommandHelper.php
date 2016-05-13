@@ -60,12 +60,20 @@ class RemoveCommandHelper
         $shows = $this->fileManagementBusiness->scandir($from);
 
         $this->logger->info(count($shows).' found');
+        $archivedShows = $this->getArchivedShows();
+
+        $processingShowId = null;
 
         foreach ($shows as $show) {
             $this->logger->info('Show : '.$show);
 
             if ($this->isWhiteListed($from.'/'.$show)) {
                 $this->logger->info('Show white listed');
+                continue;
+            }
+
+            if ($this->isArchivedShow($archivedShows, $processingShowId)) {
+                $this->logger->info('Show archived');
                 continue;
             }
 
@@ -77,11 +85,14 @@ class RemoveCommandHelper
 
                 if (is_file($from.'/'.$show.'/'.$episode) && !$this->isVideo($episode)) {
                     $this->logger->info(sprintf('The file %s is not a video file. Continue.', $episode));
+                    continue;
                 }
 
                 try {
-                    $episodeData = $this->getEpisodeFromFileName($episode);
-                } catch (\Exception $e) {
+                    $episodeData      = $this->getEpisodeFromFileName($episode);
+                    $processingShowId = $episodeData->show->ids->trakt;
+                }
+                catch (\Exception $e) {
                     $this->logger->info('Episode not found on BetaSeries');
                     continue;
                 }
@@ -99,6 +110,10 @@ class RemoveCommandHelper
                         $this->logger->info('No more show in Show directory. Remove '.$from.'/'.$show);
                         $this->remove($from.'/'.$show);
                     }
+                }
+
+                if ($i === count($episode)) {
+                    $processingShowId = null;
                 }
             }
         }
@@ -121,7 +136,8 @@ class RemoveCommandHelper
     {
         try {
             $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
     }
@@ -165,7 +181,8 @@ class RemoveCommandHelper
     {
         try {
             return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             $this->logger->error($e->getMessage());
 
             return false;
@@ -180,5 +197,32 @@ class RemoveCommandHelper
     private function isVideo($file)
     {
         return $this->fileManagementBusiness->isVideo($file);
+    }
+
+    /**
+     * @param array $archivedShows
+     * @param int   $processingShowId
+     *
+     * @return bool
+     */
+    private function isArchivedShow($archivedShows, $processingShowId)
+    {
+        return in_array($processingShowId, array_keys($archivedShows));
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getArchivedShows()
+    {
+        $archivedShows = $this->traktTvApiWrapper->getArchivedShows();
+
+        $organizedArchivedShows = [];
+        foreach ($archivedShows as $archivedShow) {
+            $organizedArchivedShows[$archivedShow->show->ids->trakt] = $archivedShow->show->title;
+        }
+
+        return $organizedArchivedShows;
     }
 }

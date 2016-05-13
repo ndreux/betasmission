@@ -14,3 +14,7 @@ Feature: Remove the watched episodes
       | /tmp/betasmission/Series/Active/Suits/Suits.s01e03.killers.mp4    | true         | true        | true        |
       | /tmp/betasmission/Series/Active/test2/KLQSDKLQSDQSD.mp4           | false        | false       | true        |
       | /tmp/betasmission/Series/Active/My.little.pony.S01E01.KILLERS.mp4 | false        | false       | true        |
+      | /tmp/betasmission/Series/Active/Sense8.S01E01.KILLERS.mp4         | false        | false       | true        |
+      | /tmp/betasmission/Series/Active/Sense8.S01E08.KILLERS.mp4         | false        | false       | true        |
+      | /tmp/betasmission/Series/Active/Sense8.S01E09.KILLERS.mp4         | false        | false       | true        |
+      | /tmp/betasmission/Series/Active/Sense8.S01E10.KILLERS.mp4         | false        | false       | true        |

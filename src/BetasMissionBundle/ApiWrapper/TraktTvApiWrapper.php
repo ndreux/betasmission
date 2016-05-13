@@ -263,4 +263,22 @@ class TraktTvApiWrapper
 
         return !empty(json_decode($response->getBody()->getContents()));
     }
+
+    /**
+     * @return mixed
+     */
+    public function getArchivedShows()
+    {
+        $headers = [
+            'Authorization'     => 'Bearer '.$this->accessToken,
+            'trakt-api-key'     => $this->clientId,
+            'Content-Type'      => 'application/json',
+            'trakt-api-version' => 2,
+        ];
+
+        $client   = new Client();
+        $response = $client->get($this->apiBasePath.'/users/ndreux/lists/ishows-archives/items/shows', ['headers' => $headers]);
+        
+        return json_decode($response->getBody()->getContents());
+    }
 }
