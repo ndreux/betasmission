@@ -9,6 +9,8 @@ use stdClass;
  */
 class BetaseriesApiWrapper extends AbstractApiWrapper
 {
+    const API_VERSION = '2.4';
+
     /**
      * @var string
      */
@@ -39,7 +41,7 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
      */
     public function getEpisodeData($episodeFileName)
     {
-        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'file' => $episodeFileName];
+        $parameters  = $this->buildParameters(['file' => $episodeFileName]);
         $searchQuery = $this->apiBasePath.'episodes/scraper?'.http_build_query($parameters);
 
         return $this->query(self::HTTP_GET, $searchQuery);
@@ -54,7 +56,7 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
      */
     public function markAsDownloaded($episodeId)
     {
-        $parameters      = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
+        $parameters      = $this->buildParameters(['id' => $episodeId]);
         $downloadedQuery = $this->apiBasePath.'episodes/downloaded';
 
         return $this->query(self::HTTP_POST, $downloadedQuery, ['form_params' => $parameters]);
@@ -70,7 +72,7 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
      */
     public function markAsWatched($episodeId)
     {
-        $parameters   = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
+        $parameters   = $this->buildParameters(['id' => $episodeId]);
         $watchedQuery = $this->apiBasePath.'episodes/watched';
 
         return $this->query(self::HTTP_POST, $watchedQuery, ['form_params' => $parameters]);
@@ -86,7 +88,7 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
      */
     public function getSubtitleByEpisodeId($episodeId, $language = 'vo')
     {
-        $parameters    = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
+        $parameters    = $this->buildParameters(['id' => $episodeId, 'language' => $language]);
         $subtitleQuery = $this->apiBasePath.'subtitles/episode?'.http_build_query($parameters);
 
         return $this->query(self::HTTP_GET, $subtitleQuery);
@@ -100,7 +102,7 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
     private function authenticate()
     {
         $authenticateQuery = $this->apiBasePath.'members/auth';
-        $parameters        = ['login' => $this->login, 'password' => $this->passwordHash, 'key' => $this->apiKey, 'v' => '2.4'];
+        $parameters        = ['login' => $this->login, 'password' => $this->passwordHash, 'key' => $this->apiKey, 'v' => self::API_VERSION];
 
         $response    = $this->query(self::HTTP_POST, $authenticateQuery, ['form_params' => $parameters]);
         $this->token = $response->token;
@@ -122,5 +124,17 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
     public function setPasswordHash($passwordHash)
     {
         $this->passwordHash = $passwordHash;
+    }
+
+    /**
+     * Merge the given parameters with the default ones such as API version, token and API key
+     *
+     * @param array $parameters
+     *
+     * @return array
+     */
+    private function buildParameters($parameters = [])
+    {
+        return array_merge(['token' => $this->token, 'key' => $this->apiKey, 'v' => self::API_VERSION], $parameters);
     }
 }
