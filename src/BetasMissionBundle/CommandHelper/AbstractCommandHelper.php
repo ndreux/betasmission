@@ -2,12 +2,15 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
+use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
+use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
+use BetasMissionBundle\Business\FileManagementBusiness;
 use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class AbstractCommandHelper
  */
-class AbstractCommandHelper
+abstract class AbstractCommandHelper
 {
     /**
      * @var Logger
@@ -15,12 +18,37 @@ class AbstractCommandHelper
     protected $logger;
 
     /**
-     * AbstractCommandHelper constructor.
-     *
-     * @param Logger $logger
+     * @var null|FileManagementBusiness
      */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
+    protected $fileStreamBusiness;
+
+    /**
+     * @var null|BetaseriesApiWrapper
+     */
+    protected $betaseriesApiWrapper;
+
+    /**
+     * @var null|TraktTvApiWrapper
+     */
+    protected $traktTvApiWrapper;
+
+    /**
+     * RemoveCommandHelper constructor.
+     *
+     * @param Logger                      $logger
+     * @param null|FileManagementBusiness $fileManagementBusiness
+     * @param null|BetaseriesApiWrapper   $betaseriesApiWrapper
+     * @param null|TraktTvApiWrapper      $traktTvApiWrapper
+     */
+    public function __construct(
+        Logger $logger,
+        FileManagementBusiness $fileManagementBusiness = null,
+        BetaseriesApiWrapper $betaseriesApiWrapper = null,
+        TraktTvApiWrapper $traktTvApiWrapper = null
+    ) {
+        $this->logger               = $logger;
+        $this->fileStreamBusiness   = $fileManagementBusiness;
+        $this->betaseriesApiWrapper = $betaseriesApiWrapper;
+        $this->traktTvApiWrapper    = $traktTvApiWrapper;
     }
 }

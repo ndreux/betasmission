@@ -2,58 +2,14 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
-use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
-use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
-use BetasMissionBundle\Business\FileManagementBusiness;
 use Exception;
 use stdClass;
-use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class RemoveCommandHelper
  */
-class RemoveCommandHelper
+class RemoveCommandHelper extends AbstractCommandHelper
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var FileManagementBusiness
-     */
-    private $filestreamBusiness;
-
-    /**
-     * @var BetaseriesApiWrapper
-     */
-    private $betaseriesApiWrapper;
-
-    /**
-     * @var TraktTvApiWrapper
-     */
-    private $traktTvApiWrapper;
-
-    /**
-     * RemoveCommandHelper constructor.
-     *
-     * @param Logger                 $logger
-     * @param FileManagementBusiness $fileManagementBusiness
-     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
-     * @param TraktTvApiWrapper      $traktTvApiWrapper
-     */
-    public function __construct(
-        Logger $logger,
-        FileManagementBusiness $fileManagementBusiness,
-        BetaseriesApiWrapper $betaseriesApiWrapper,
-        TraktTvApiWrapper $traktTvApiWrapper
-    ) {
-        $this->logger               = $logger;
-        $this->filestreamBusiness   = $fileManagementBusiness;
-        $this->betaseriesApiWrapper = $betaseriesApiWrapper;
-        $this->traktTvApiWrapper    = $traktTvApiWrapper;
-    }
-
     /**
      * Remove all the watched episode located in the given directory
      *
@@ -61,7 +17,7 @@ class RemoveCommandHelper
      */
     public function removeWatched($from)
     {
-        $shows = $this->filestreamBusiness->scandir($from);
+        $shows = $this->fileStreamBusiness->scandir($from);
 
         $this->logger->info(count($shows).' found');
 
@@ -73,7 +29,7 @@ class RemoveCommandHelper
             }
 
             $showPath = $from.'/'.$show;
-            $episodes = $this->filestreamBusiness->scandir($showPath);
+            $episodes = $this->fileStreamBusiness->scandir($showPath);
 
             foreach ($episodes as $episode) {
 
@@ -82,7 +38,7 @@ class RemoveCommandHelper
 
                 $this->logger->info($episode);
 
-                if (!$this->filestreamBusiness->isVideo($episode)) {
+                if (!is_dir($episodePath) && !$this->fileStreamBusiness->isVideo($episode)) {
                     continue;
                 }
 
@@ -118,7 +74,7 @@ class RemoveCommandHelper
      */
     private function remove($toBeRemoved)
     {
-        $this->filestreamBusiness->remove($toBeRemoved);
+        $this->fileStreamBusiness->remove($toBeRemoved);
     }
 
     /**
