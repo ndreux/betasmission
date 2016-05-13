@@ -83,9 +83,14 @@ class FileManagementBusiness
      */
     public function isVideo($file)
     {
-        $filePathInfo = pathinfo($file);
+        if (!is_file($file)) {
+            return false;
+        }
 
-        return in_array($filePathInfo['extension'], ['mp4', 'mkv', 'avi']);
+        $isVideo = in_array(pathinfo($file, PATHINFO_EXTENSION), ['mp4', 'mkv', 'avi']);
+        (!$isVideo) ? $this->logger->info(sprintf('The file %s is not a video file.', $file)) : null;
+
+        return $isVideo;
     }
 
     /**

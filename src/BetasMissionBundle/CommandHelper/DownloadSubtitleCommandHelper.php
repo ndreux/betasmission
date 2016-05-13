@@ -69,7 +69,7 @@ class DownloadSubtitleCommandHelper
         $showPath = $from.'/'.$show;
         $episodes = $this->getList($showPath);
 
-        foreach ($episodes as $i => $episode) {
+        foreach ($episodes as $episode) {
             $this->downloadSubtitleForEpisode($episode, $showPath);
         }
     }

@@ -2,7 +2,6 @@
 
 namespace BetasMissionBundle\ApiWrapper;
 
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 
@@ -50,18 +49,18 @@ abstract class AbstractApiWrapper
      * @var string
      */
     protected $apiKey;
-    
+
     /**
      * @param string $method
      * @param string $uri
      * @param array  $options
      *
-     * @return mixed
      * @throws \Exception
+     *
+     * @return mixed
      */
     protected function query($method, $uri, array $options = [])
     {
-
         if (!in_array($method, ['post', 'get'])) {
             throw new \Exception('Bad method');
         }
@@ -75,5 +74,4 @@ abstract class AbstractApiWrapper
 
         return json_decode($response->getBody()->getContents());
     }
-    
 }

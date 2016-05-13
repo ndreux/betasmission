@@ -60,7 +60,6 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
         $downloadedQuery = $this->apiBasePath.'episodes/downloaded';
 
         return $this->query(self::HTTP_POST, $downloadedQuery, ['form_params' => $parameters]);
-
     }
 
     /**

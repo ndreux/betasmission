@@ -167,8 +167,9 @@ class TraktTvApiWrapper extends AbstractApiWrapper
      * @param string $uri
      * @param array  $options
      *
-     * @return mixed
      * @throws \Exception
+     *
+     * @return mixed
      */
     protected function query($method, $uri, array $options = [])
     {
