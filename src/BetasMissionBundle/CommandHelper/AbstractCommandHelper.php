@@ -36,18 +36,18 @@ abstract class AbstractCommandHelper
      * RemoveCommandHelper constructor.
      *
      * @param Logger                      $logger
-     * @param null|FileManagementBusiness $fileManagementBusiness
+     * @param null|FileManagementBusiness $fileStreamBusiness
      * @param null|BetaseriesApiWrapper   $betaseriesApiWrapper
      * @param null|TraktTvApiWrapper      $traktTvApiWrapper
      */
     public function __construct(
         Logger $logger,
-        FileManagementBusiness $fileManagementBusiness = null,
+        FileManagementBusiness $fileStreamBusiness = null,
         BetaseriesApiWrapper $betaseriesApiWrapper = null,
         TraktTvApiWrapper $traktTvApiWrapper = null
     ) {
         $this->logger               = $logger;
-        $this->fileStreamBusiness   = $fileManagementBusiness;
+        $this->fileStreamBusiness   = $fileStreamBusiness;
         $this->betaseriesApiWrapper = $betaseriesApiWrapper;
         $this->traktTvApiWrapper    = $traktTvApiWrapper;
     }

@@ -10,7 +10,6 @@ use stdClass;
  */
 class MoveCommandHelper extends AbstractCommandHelper
 {
-
     /**
      * Organize.
      * 
@@ -28,8 +27,7 @@ class MoveCommandHelper extends AbstractCommandHelper
             try {
                 $episodeData     = $this->betaseriesApiWrapper->getEpisodeData($episode);
                 $destinationPath = $this->getTVShowDestinationPath($destination, $defaultDestination, $episodeData);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->info('The episode has not been found.');
                 $destinationPath = $defaultDestination;
             }
@@ -89,8 +87,7 @@ class MoveCommandHelper extends AbstractCommandHelper
         try {
             $this->traktTvApiWrapper->markAsDownloaded($episodeData->episode->thetvdb_id);
             $this->logger->info('Marked the episode as downloaded');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->info('The user does dot watch this show.');
         }
     }

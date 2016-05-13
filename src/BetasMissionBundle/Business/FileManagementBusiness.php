@@ -40,14 +40,11 @@ class FileManagementBusiness
         }
 
         foreach ($this->scandir($src) as $file) {
-
             $srcPath = $src.'/'.$file;
             $dstPath = $dst.'/'.$file;
 
-
             $this->copy($srcPath, $dstPath);
             $this->logger->info('Copy : '.$srcPath.' to '.$dstPath);
-
         }
 
         return false;

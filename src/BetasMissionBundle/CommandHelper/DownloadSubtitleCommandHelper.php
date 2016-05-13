@@ -58,8 +58,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
 
         try {
             $episodeData = $this->betaseriesApiWrapper->getEpisodeData($episode);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->info('Episode not found on BetaSeries');
 
             return;
@@ -191,7 +190,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
 
         $this->fileStreamBusiness->copy($tempSubtitle, $this->getSubtitleFileNameFromEpisode($episode));
         $this->fileStreamBusiness->remove($tempSubtitle);
-        
+
         $this->logger->info('Subtitle applied');
 
         return true;
@@ -204,9 +203,8 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     public function isVOSTFREpisode($episode)
     {
-        $isVOSTFREpisode = (strpos($this->fileStreamBusiness->slugify(pathinfo($episode, PATHINFO_FILENAME)), 'vostfr') !== false);
+        $isVOSTFREpisode = strpos($this->fileStreamBusiness->slugify(pathinfo($episode, PATHINFO_FILENAME)), 'vostfr') !== false;
         ($isVOSTFREpisode) ? $this->logger->info('VOSTFR Episode') : null;
-
 
         return $isVOSTFREpisode;
     }

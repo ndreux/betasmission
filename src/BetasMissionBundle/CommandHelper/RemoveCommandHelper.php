@@ -32,7 +32,6 @@ class RemoveCommandHelper extends AbstractCommandHelper
             $episodes = $this->fileStreamBusiness->scandir($showPath);
 
             foreach ($episodes as $episode) {
-
                 $episodePath  = $showPath.'/'.$episode;
                 $episodeCount = count($episodes);
 
@@ -44,8 +43,7 @@ class RemoveCommandHelper extends AbstractCommandHelper
 
                 try {
                     $episodeData = $this->getEpisodeFromFileName($episode);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $this->logger->info('Episode not found on BetaSeries');
                     continue;
                 }
@@ -84,8 +82,7 @@ class RemoveCommandHelper extends AbstractCommandHelper
     {
         try {
             $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
     }
@@ -132,8 +129,7 @@ class RemoveCommandHelper extends AbstractCommandHelper
     {
         try {
             $hasBeenSeen = $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
             $hasBeenSeen = false;
         }
