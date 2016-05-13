@@ -9,33 +9,8 @@ use stdClass;
 /**
  * Class TraktTvApiWrapper
  */
-class TraktTvApiWrapper
+class TraktTvApiWrapper extends AbstractApiWrapper
 {
-    /**
-     * @var string
-     */
-    private $clientId;
-    /**
-     * @var string
-     */
-    private $clientSecret;
-    /**
-     * @var string
-     */
-    private $apiBasePath;
-    /**
-     * @var string
-     */
-    private $accessToken;
-    /**
-     * @var string
-     */
-    private $refreshToken;
-    /**
-     * @var string
-     */
-    private $applicationPin;
-
     /**
      * @var stdClass[]
      */
@@ -89,24 +64,10 @@ class TraktTvApiWrapper
      */
     public function markAsDownloaded($thetvbdId)
     {
-        $headers = [
-            'Authorization'     => 'Bearer '.$this->accessToken,
-            'trakt-api-key'     => $this->clientId,
-            'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2,
-        ];
-
         $episode      = new \stdClass();
         $episode->ids = ['tvdb' => $thetvbdId];
 
-        $client = new Client();
-        $client->post(
-            $this->apiBasePath.'/sync/collection',
-            [
-                'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]]),
-            ]
-        );
+        $this->query(self::HTTP_POST, $this->apiBasePath.'/sync/collection', ['body' => json_encode(['episodes' => [$episode]])]);
     }
 
     /**
@@ -115,27 +76,13 @@ class TraktTvApiWrapper
      */
     public function markAsWatched($thetvbdId, $watchedDateTime = null)
     {
-        $headers = [
-            'Authorization'     => 'Bearer '.$this->accessToken,
-            'trakt-api-key'     => $this->clientId,
-            'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2,
-        ];
-
         $watchedAt = ($watchedDateTime === null) ? new DateTime() : $watchedDateTime;
 
         $episode             = new \stdClass();
         $episode->ids        = ['tvdb' => $thetvbdId];
         $episode->watched_at = $watchedAt->format('Y-m-dTH:i:s');
 
-        $client = new Client();
-        $client->post(
-            $this->apiBasePath.'/sync/history',
-            [
-                'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]]),
-            ]
-        );
+        $this->query(self::HTTP_POST, $this->apiBasePath.'/sync/history', ['body' => json_encode(['episodes' => [$episode]])]);
     }
 
     /**
@@ -144,24 +91,10 @@ class TraktTvApiWrapper
      */
     public function removeFromCollection($thetvbdId)
     {
-        $headers = [
-            'Authorization'     => 'Bearer '.$this->accessToken,
-            'trakt-api-key'     => $this->clientId,
-            'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2,
-        ];
-
         $episode      = new \stdClass();
         $episode->ids = ['tvdb' => $thetvbdId];
 
-        $client = new Client();
-        $client->post(
-            $this->apiBasePath.'/sync/collection/remove',
-            [
-                'headers' => $headers,
-                'body'    => json_encode(['episodes' => [$episode]]),
-            ]
-        );
+        $this->query(self::HTTP_POST, $this->apiBasePath.'/sync/collection/remove', ['body' => json_encode(['episodes' => [$episode]])]);
     }
 
     /**
@@ -173,17 +106,7 @@ class TraktTvApiWrapper
             return $this->collection;
         }
 
-        $headers = [
-            'Authorization'     => 'Bearer '.$this->accessToken,
-            'trakt-api-key'     => $this->clientId,
-            'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2,
-        ];
-
-        $client   = new Client();
-        $response = $client->get($this->apiBasePath.'/sync/collection/shows', ['headers' => $headers]);
-
-        $this->collection = json_decode($response->getBody()->getContents());
+        $this->collection = $this->query(self::HTTP_GET, $this->apiBasePath.'/sync/collection/shows');
 
         return $this->collection;
     }
@@ -222,22 +145,7 @@ class TraktTvApiWrapper
      */
     public function searchEpisode($tvdbId)
     {
-        $headers = [
-            'trakt-api-key'     => $this->clientId,
-            'Content-Type'      => 'application/json',
-            'trakt-api-version' => 2,
-        ];
-
-        $client   = new Client();
-        $response = $client->get(
-            $this->apiBasePath.'/search',
-            [
-                'headers' => $headers,
-                'query'   => ['id_type' => 'tvdb', 'id' => $tvdbId],
-            ]
-        );
-
-        $response = json_decode($response->getBody()->getContents());
+        $response = $this->query(self::HTTP_GET, $this->apiBasePath.'/search', ['query' => ['id_type' => 'tvdb', 'id' => $tvdbId]]);
 
         return array_shift($response);
     }
@@ -251,6 +159,19 @@ class TraktTvApiWrapper
      */
     public function hasEpisodeBeenSeen($traktTvId)
     {
+        return !empty($this->query(self::HTTP_GET, sprintf($this->apiBasePath.'/sync/history/episodes/%d', $traktTvId)));
+    }
+
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param array  $options
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function query($method, $uri, array $options = [])
+    {
         $headers = [
             'Authorization'     => 'Bearer '.$this->accessToken,
             'trakt-api-key'     => $this->clientId,
@@ -258,9 +179,6 @@ class TraktTvApiWrapper
             'trakt-api-version' => 2,
         ];
 
-        $client   = new Client();
-        $response = $client->get(sprintf($this->apiBasePath.'/sync/history/episodes/%d', $traktTvId), ['headers' => $headers]);
-
-        return !empty(json_decode($response->getBody()->getContents()));
+        return parent::query($method, $uri, array_merge($options, ['headers' => $headers]));
     }
 }
