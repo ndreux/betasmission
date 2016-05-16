@@ -16,7 +16,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
      */
     public function downloadSubtitles($from)
     {
-        $shows = $this->getList($from);
+        $shows = $this->fileStreamBusiness->scandir($from);
         $this->logger->info(count($shows).' found');
 
         foreach ($shows as $show) {
@@ -35,7 +35,7 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         $this->logger->info('Show : '.$show);
 
         $showPath = $from.'/'.$show;
-        $episodes = $this->getList($showPath);
+        $episodes = $this->fileStreamBusiness->scandir($showPath);
 
         foreach ($episodes as $episode) {
             $this->downloadSubtitleForEpisode($episode, $showPath);
@@ -344,17 +344,5 @@ class DownloadSubtitleCommandHelper extends AbstractCommandHelper
         $this->logger->info(count($subtitles->subtitles).' found');
 
         return $subtitles;
-    }
-
-    /**
-     * Return a list of show contained in the given $showPath
-     *
-     * @param string $showPath
-     *
-     * @return string[]
-     */
-    public function getList($showPath)
-    {
-        return $this->fileStreamBusiness->scandir($showPath);
     }
 }
