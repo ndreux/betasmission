@@ -57,4 +57,14 @@ class RemoveContext extends AbstractCommandContext
     {
         return pathinfo($file, PATHINFO_DIRNAME).'/.do_not_remove.lock';
     }
+
+    /**
+     * @When /^I have a file named "([^"]*)"$/
+     * @And /^I have a file named "([^"]*)"$/
+     */
+    public function iHaveAFileNamed($file)
+    {
+        $this->createFile($file);
+        $this->assertFileExists($file);
+    }
 }

@@ -197,7 +197,7 @@ class TraktTvApiWrapper extends AbstractApiWrapper
 
         $client   = new Client();
         $response = $client->get($this->apiBasePath.'/users/ndreux/lists/ishows-archives/items/shows', ['headers' => $headers]);
-        
+
         return json_decode($response->getBody()->getContents());
     }
 }
