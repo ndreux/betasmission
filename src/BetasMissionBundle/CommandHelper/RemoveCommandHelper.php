@@ -2,54 +2,14 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
-use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
-use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
-use BetasMissionBundle\Business\FileManagementBusiness;
 use Exception;
 use stdClass;
-use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class RemoveCommandHelper
  */
-class RemoveCommandHelper
+class RemoveCommandHelper extends AbstractCommandHelper
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var FileManagementBusiness
-     */
-    private $fileManagementBusiness;
-
-    /**
-     * @var BetaseriesApiWrapper
-     */
-    private $betaseriesApiWrapper;
-
-    /**
-     * @var TraktTvApiWrapper
-     */
-    private $traktTvApiWrapper;
-
-    /**
-     * RemoveCommandHelper constructor.
-     *
-     * @param Logger                 $logger
-     * @param FileManagementBusiness $fileManagementBusiness
-     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
-     * @param TraktTvApiWrapper      $traktTvApiWrapper
-     */
-    public function __construct(Logger $logger, FileManagementBusiness $fileManagementBusiness, BetaseriesApiWrapper $betaseriesApiWrapper, TraktTvApiWrapper $traktTvApiWrapper)
-    {
-        $this->logger                 = $logger;
-        $this->fileManagementBusiness = $fileManagementBusiness;
-        $this->betaseriesApiWrapper   = $betaseriesApiWrapper;
-        $this->traktTvApiWrapper      = $traktTvApiWrapper;
-    }
-
     /**
      * Remove all the watched episode located in the given directory
      *
@@ -57,7 +17,7 @@ class RemoveCommandHelper
      */
     public function removeWatched($from)
     {
-        $shows = $this->fileManagementBusiness->scandir($from);
+        $shows = $this->fileStreamBusiness->scandir($from);
 
         $this->logger->info(count($shows).' found');
         $archivedShows = $this->getArchivedShows();
@@ -68,7 +28,6 @@ class RemoveCommandHelper
             $this->logger->info('Show : '.$show);
 
             if ($this->isWhiteListed($from.'/'.$show)) {
-                $this->logger->info('Show white listed');
                 continue;
             }
 
@@ -76,15 +35,17 @@ class RemoveCommandHelper
                 $this->logger->info('Show archived');
                 continue;
             }
+            
+            $showPath = $from.'/'.$show;
+            $episodes = $this->fileStreamBusiness->scandir($showPath);
 
-            $episodes = $this->fileManagementBusiness->scandir($from.'/'.$show);
-
-            foreach ($episodes as $i => $episode) {
+            foreach ($episodes as $episode) {
+                $episodePath  = $showPath.'/'.$episode;
                 $episodeCount = count($episodes);
+
                 $this->logger->info($episode);
 
-                if (is_file($from.'/'.$show.'/'.$episode) && !$this->isVideo($episode)) {
-                    $this->logger->info(sprintf('The file %s is not a video file. Continue.', $episode));
+                if (!is_dir($episodePath) && !$this->fileStreamBusiness->isVideo($episode)) {
                     continue;
                 }
 
@@ -98,22 +59,17 @@ class RemoveCommandHelper
                 }
 
                 $hasBeenSeen = $this->hasEpisodeBeenSeen($episodeData->episode->ids->trakt);
-                $this->logger->info('Episode seen : '.($hasBeenSeen ? 'true' : 'false'));
 
                 if ($hasBeenSeen) {
                     $this->removeFromCollection($episodeData->episode->ids->tvdb);
-                    $this->remove($from.'/'.$show.'/'.$episode);
+                    $this->remove($episodePath);
 
                     --$episodeCount;
 
                     if ($episodeCount === 0) {
-                        $this->logger->info('No more show in Show directory. Remove '.$from.'/'.$show);
-                        $this->remove($from.'/'.$show);
+                        $this->logger->info('No more show in Show directory. Remove '.$showPath);
+                        $this->remove($showPath);
                     }
-                }
-
-                if ($i === count($episode)) {
-                    $processingShowId = null;
                 }
             }
         }
@@ -126,7 +82,7 @@ class RemoveCommandHelper
      */
     private function remove($toBeRemoved)
     {
-        $this->fileManagementBusiness->remove($toBeRemoved);
+        $this->fileStreamBusiness->remove($toBeRemoved);
     }
 
     /**
@@ -136,8 +92,7 @@ class RemoveCommandHelper
     {
         try {
             $this->traktTvApiWrapper->removeFromCollection($thetvdbId);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
     }
@@ -151,7 +106,10 @@ class RemoveCommandHelper
      */
     private function isWhiteListed($showPath)
     {
-        return file_exists($showPath.'/.do_not_remove.lock');
+        $fileExists = file_exists($showPath.'/.do_not_remove.lock');
+        ($fileExists) ? $this->logger->info('Show white listed') : null;
+
+        return $fileExists;
     }
 
     /**
@@ -180,23 +138,15 @@ class RemoveCommandHelper
     private function hasEpisodeBeenSeen($traktTvId)
     {
         try {
-            return $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
-        }
-        catch (Exception $e) {
+            $hasBeenSeen = $this->traktTvApiWrapper->hasEpisodeBeenSeen($traktTvId);
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
-
-            return false;
+            $hasBeenSeen = false;
         }
-    }
 
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function isVideo($file)
-    {
-        return $this->fileManagementBusiness->isVideo($file);
+        $this->logger->info('Episode seen : '.($hasBeenSeen ? 'true' : 'false'));
+
+        return $hasBeenSeen;
     }
 
     /**

@@ -7,27 +7,9 @@ use stdClass;
 /**
  * Class BetaseriesApiWrapper.
  */
-class BetaseriesApiWrapper
+class BetaseriesApiWrapper extends AbstractApiWrapper
 {
-    /**
-     * @var string
-     */
-    private $login;
-
-    /**
-     * @var string
-     */
-    private $passwordHash;
-
-    /**
-     * @var string
-     */
-    private $apiKey;
-
-    /**
-     * @var string
-     */
-    private $apiBasePath;
+    const API_VERSION = '2.4';
 
     /**
      * @var string
@@ -46,6 +28,8 @@ class BetaseriesApiWrapper
         $this->passwordHash = $passwordHash;
         $this->apiKey       = $apiKey;
         $this->apiBasePath  = $apiBasePath;
+
+        $this->authenticate();
     }
 
     /**
@@ -57,26 +41,10 @@ class BetaseriesApiWrapper
      */
     public function getEpisodeData($episodeFileName)
     {
-        if ($this->token === null) {
-            $this->authenticate();
-        }
-
-        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'file' => $episodeFileName];
+        $parameters  = $this->buildParameters(['file' => $episodeFileName]);
         $searchQuery = $this->apiBasePath.'episodes/scraper?'.http_build_query($parameters);
 
-        $curlResource = curl_init();
-
-        curl_setopt($curlResource, CURLOPT_URL, $searchQuery);
-        curl_setopt($curlResource, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($curlResource);
-
-        if (curl_getinfo($curlResource, CURLINFO_HTTP_CODE) !== 200) {
-            throw new \Exception('API call did not return 200');
-        }
-        curl_close($curlResource);
-
-        return json_decode($result);
+        return $this->query(self::HTTP_GET, $searchQuery);
     }
 
     /**
@@ -88,28 +56,10 @@ class BetaseriesApiWrapper
      */
     public function markAsDownloaded($episodeId)
     {
-        if ($this->token === null) {
-            $this->authenticate();
-        }
+        $parameters      = $this->buildParameters(['id' => $episodeId]);
+        $downloadedQuery = $this->apiBasePath.'episodes/downloaded';
 
-        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
-        $searchQuery = $this->apiBasePath.'episodes/downloaded';
-
-        $curlResource = curl_init();
-
-        curl_setopt($curlResource, CURLOPT_URL, $searchQuery);
-        curl_setopt($curlResource, CURLOPT_POST, true);
-        curl_setopt($curlResource, CURLOPT_POSTFIELDS, $parameters);
-        curl_setopt($curlResource, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($curlResource);
-
-        if (curl_getinfo($curlResource, CURLINFO_HTTP_CODE) !== 200) {
-            throw new \Exception('API call did not return 200');
-        }
-        curl_close($curlResource);
-
-        return json_decode($result);
+        return $this->query(self::HTTP_POST, $downloadedQuery, ['form_params' => $parameters]);
     }
 
     /**
@@ -121,28 +71,10 @@ class BetaseriesApiWrapper
      */
     public function markAsWatched($episodeId)
     {
-        if ($this->token === null) {
-            $this->authenticate();
-        }
-
-        $parameters   = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId];
+        $parameters   = $this->buildParameters(['id' => $episodeId]);
         $watchedQuery = $this->apiBasePath.'episodes/watched';
 
-        $curlResource = curl_init();
-
-        curl_setopt($curlResource, CURLOPT_URL, $watchedQuery);
-        curl_setopt($curlResource, CURLOPT_POST, true);
-        curl_setopt($curlResource, CURLOPT_POSTFIELDS, $parameters);
-        curl_setopt($curlResource, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($curlResource);
-
-        if (curl_getinfo($curlResource, CURLINFO_HTTP_CODE) !== 200) {
-            throw new \Exception('API call did not return 200');
-        }
-        curl_close($curlResource);
-
-        return json_decode($result);
+        return $this->query(self::HTTP_POST, $watchedQuery, ['form_params' => $parameters]);
     }
 
     /**
@@ -155,26 +87,10 @@ class BetaseriesApiWrapper
      */
     public function getSubtitleByEpisodeId($episodeId, $language = 'vo')
     {
-        if ($this->token === null) {
-            $this->authenticate();
-        }
+        $parameters    = $this->buildParameters(['id' => $episodeId, 'language' => $language]);
+        $subtitleQuery = $this->apiBasePath.'subtitles/episode?'.http_build_query($parameters);
 
-        $parameters  = ['token' => $this->token, 'key' => $this->apiKey, 'v' => '2.4', 'id' => $episodeId, 'language' => $language];
-        $searchQuery = $this->apiBasePath.'subtitles/episode?'.http_build_query($parameters);
-
-        $curlResource = curl_init();
-
-        curl_setopt($curlResource, CURLOPT_URL, $searchQuery);
-        curl_setopt($curlResource, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($curlResource);
-
-        if (curl_getinfo($curlResource, CURLINFO_HTTP_CODE) !== 200) {
-            throw new \Exception('API call did not return 200');
-        }
-        curl_close($curlResource);
-
-        return json_decode($result);
+        return $this->query(self::HTTP_GET, $subtitleQuery);
     }
 
     /**
@@ -184,26 +100,11 @@ class BetaseriesApiWrapper
      */
     private function authenticate()
     {
-        $authenticateUrl = $this->apiBasePath.'members/auth';
-        $parameters      = ['login' => $this->login, 'password' => $this->passwordHash, 'key' => $this->apiKey, 'v' => '2.4'];
+        $authenticateQuery = $this->apiBasePath.'members/auth';
+        $parameters        = ['login' => $this->login, 'password' => $this->passwordHash, 'key' => $this->apiKey, 'v' => self::API_VERSION];
 
-        $curlResource = curl_init();
-
-        curl_setopt($curlResource, CURLOPT_URL, $authenticateUrl);
-        curl_setopt($curlResource, CURLOPT_POST, true);
-        curl_setopt($curlResource, CURLOPT_POSTFIELDS, $parameters);
-        curl_setopt($curlResource, CURLOPT_RETURNTRANSFER, true);
-
-        $result = curl_exec($curlResource);
-
-        if (curl_getinfo($curlResource, CURLINFO_HTTP_CODE) !== 200) {
-            throw new \Exception('API call did not return 200');
-        }
-        curl_close($curlResource);
-
-        $apiReturn = json_decode($result);
-
-        $this->token = $apiReturn->token;
+        $response    = $this->query(self::HTTP_POST, $authenticateQuery, ['form_params' => $parameters]);
+        $this->token = $response->token;
 
         return true;
     }
@@ -222,5 +123,17 @@ class BetaseriesApiWrapper
     public function setPasswordHash($passwordHash)
     {
         $this->passwordHash = $passwordHash;
+    }
+
+    /**
+     * Merge the given parameters with the default ones such as API version, token and API key
+     *
+     * @param array $parameters
+     *
+     * @return array
+     */
+    private function buildParameters($parameters = [])
+    {
+        return array_merge(['token' => $this->token, 'key' => $this->apiKey, 'v' => self::API_VERSION], $parameters);
     }
 }

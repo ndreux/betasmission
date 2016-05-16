@@ -2,57 +2,24 @@
 
 namespace BetasMissionBundle\CommandHelper;
 
-use BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper;
-use BetasMissionBundle\ApiWrapper\TraktTvApiWrapper;
-use BetasMissionBundle\Business\FileManagementBusiness;
 use Exception;
 use stdClass;
-use Symfony\Bridge\Monolog\Logger;
 
 /**
  * Class MoveCommandHelper
  */
-class MoveCommandHelper
+class MoveCommandHelper extends AbstractCommandHelper
 {
     /**
-     * @var Logger
+     * Organize.
+     * 
+     * @param string $from
+     * @param string $destination
+     * @param string $defaultDestination
      */
-    private $logger;
-
-    /**
-     * @var FileManagementBusiness
-     */
-    private $fileManagementBusiness;
-
-    /**
-     * @var BetaseriesApiWrapper
-     */
-    private $betaseriesApiWrapper;
-
-    /**
-     * @var TraktTvApiWrapper
-     */
-    private $traktTvApiWrapper;
-
-    /**
-     * MoveCommandHelper constructor.
-     *
-     * @param Logger                 $logger
-     * @param FileManagementBusiness $fileManagementBusiness
-     * @param BetaseriesApiWrapper   $betaseriesApiWrapper
-     * @param TraktTvApiWrapper      $traktTvApiWrapper
-     */
-    public function __construct(Logger $logger, FileManagementBusiness $fileManagementBusiness, BetaseriesApiWrapper $betaseriesApiWrapper, TraktTvApiWrapper $traktTvApiWrapper)
-    {
-        $this->logger                 = $logger;
-        $this->fileManagementBusiness = $fileManagementBusiness;
-        $this->betaseriesApiWrapper   = $betaseriesApiWrapper;
-        $this->traktTvApiWrapper      = $traktTvApiWrapper;
-    }
-
     public function organize($from, $destination, $defaultDestination)
     {
-        $episodes = $this->fileManagementBusiness->scandir($from);
+        $episodes = $this->fileStreamBusiness->scandir($from);
 
         foreach ($episodes as $episode) {
             $this->logger->info('File : '.$episode);
@@ -83,8 +50,8 @@ class MoveCommandHelper
     {
         $from .= '/'.$episode;
 
-        $this->fileManagementBusiness->copy($from, $destinationPath.'/'.$episode);
-        $this->fileManagementBusiness->remove($from);
+        $this->fileStreamBusiness->copy($from, $destinationPath.'/'.$episode);
+        $this->fileStreamBusiness->remove($from);
 
         return true;
     }
@@ -117,13 +84,6 @@ class MoveCommandHelper
      */
     private function markAsDownloaded($episodeData)
     {
-        try {
-            $this->betaseriesApiWrapper->markAsDownloaded($episodeData->episode->id);
-            $this->logger->info('Marked the episode as downloaded');
-        } catch (Exception $e) {
-            $this->logger->info('The user does dot watch this show.');
-        }
-
         try {
             $this->traktTvApiWrapper->markAsDownloaded($episodeData->episode->thetvdb_id);
             $this->logger->info('Marked the episode as downloaded');
