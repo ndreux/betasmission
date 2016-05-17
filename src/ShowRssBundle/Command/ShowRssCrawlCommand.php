@@ -40,46 +40,57 @@ class ShowRssCrawlCommand extends ContainerAwareCommand
         $this->crawl($links, $since);
     }
 
+    /**
+     * @param string[] $links
+     * @param string   $from
+     */
     private function crawl($links, $from)
     {
         $sinceDate = DateTime::createFromFormat('Y-m-d-H:i:s', $from);
+        $this->getContainer()->get('logger')->info(sprintf('Crawling since : %s', $sinceDate->format('Y-m-d H:i:s')));
 
-        $transmission = $this->getContainer()->get('transmission');
-        $torrents     = $transmission->all();
 
         foreach ($links as $link) {
 
+            $this->getContainer()->get('logger')->info(sprintf('Crawling link : %s', $link));
             $xml = new \SimpleXMLElement(file_get_contents($link));
 
             foreach ($xml->channel->item as $episode) {
+
+                $this->getContainer()->get('logger')->info(sprintf('File : %s', (string)$episode->title));
                 $episodeDate = DateTime::createFromFormat(DateTime::RFC2822, $episode->pubDate);
 
-                if ($episodeDate > $sinceDate && !$this->isAlreadyDownloading($episode, $torrents)) {
+                if ($episodeDate > $sinceDate && !$this->isAlreadyDownloading($episode)) {
                     try {
-                        $transmission->add((string)$episode->link);
+                        $this->getContainer()->get('transmission')->add((string)$episode->link);
+                        $this->getContainer()->get('logger')->info('File added.');
                     } catch (Exception $e) {
+                        $this->getContainer()->get('logger')->error(sprintf('Error : %s', $e->getMessage()));
+
                         return;
                     }
                 }
             }
 
-            $this->logProcess((new DateTime())->format('Y-m-d-H:i:s'));
-
+            $this->logProcess((new DateTime())->setTimezone(new \DateTimeZone('GMT'))->format('Y-m-d-H:i:s'));
         }
     }
 
     /**
      * @param \SimpleXMLElement $episode
-     * @param Torrent[]         $torrents
      *
      * @return bool
      */
-    private function isAlreadyDownloading($episode, $torrents)
+    private function isAlreadyDownloading($episode)
     {
+        /** @var Torrent[] $torrents */
+        $torrents    = $this->getContainer()->get('transmission')->all();
         $torrentHash = $this->getHasFromMagnetLink((string)$episode->link);
 
         foreach ($torrents as $torrent) {
             if ($torrent->getHash() === $torrentHash) {
+                $this->getContainer()->get('logger')->info('Already downloading');
+
                 return true;
             }
         }
@@ -115,9 +126,10 @@ class ShowRssCrawlCommand extends ContainerAwareCommand
      */
     private function getPreviousLogFile()
     {
-        foreach (scandir(self::LOGFILE_DIRECTORY) as $file) {
+        ;
+        foreach (scandir($this->getContainer()->get('kernel')->getRootDir() . '/../'.self::LOGFILE_DIRECTORY) as $file) {
             if (preg_match("/^crawler\-.*$/", $file)) {
-                return self::LOGFILE_DIRECTORY.$file;
+                return $this->getContainer()->get('kernel')->getRootDir() . '/../'.self::LOGFILE_DIRECTORY.$file;
             }
         }
 
@@ -131,20 +143,22 @@ class ShowRssCrawlCommand extends ContainerAwareCommand
      */
     private function createLogFile($from)
     {
-        return touch(self::LOGFILE_DIRECTORY.'crawler-'.$from);
+        $logFile = $this->getContainer()->get('kernel')->getRootDir() . '/../'.self::LOGFILE_DIRECTORY.'crawler-'.$from;
+        $this->getContainer()->get('logger')->info(sprintf('Create log file : %s', $logFile));
+
+        return touch($logFile);
     }
 
     /**
-     * Find 
+     * Find
+     *
      * @return DateTime
      */
     private function getLastRunDateFromLogFile()
     {
         $previousLogFile = $this->getPreviousLogFile();
         if (!$previousLogFile) {
-            $dateTime = DateTime::createFromFormat('U', strtotime('5 days ago'), new \DateTimeZone('GMT'));
-
-            return $dateTime->format('Y-m-d-H:i:s');
+            return (new DateTime())->setTimestamp(strtotime('5 days ago'))->setTimezone(new \DateTimeZone('GMT'))->format('Y-m-d-H:i:s');
         }
 
         $timeData = explode('-', $previousLogFile);
