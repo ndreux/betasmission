@@ -4,9 +4,60 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a4f76cde7ac1e80de097cde150ecd983",
-    "content-hash": "93fda42af939b8b2b2907d95bf37862e",
+    "hash": "e07b467eb1281cb3cd83c4c2692808cb",
+    "content-hash": "ddc81b63f05dabd3c0ea5dbb1c87c198",
     "packages": [
+        {
+            "name": "chellem/transmission-bundle",
+            "version": "dev-feat-symfony-3",
+            "target-dir": "Transmission/Bundle/TransmissionBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ndreux/TransmissionBundle.git",
+                "reference": "7a873019713797d0c5633c6ff60a0f1c7ceb042b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ndreux/TransmissionBundle/zipball/7a873019713797d0c5633c6ff60a0f1c7ceb042b",
+                "reference": "7a873019713797d0c5633c6ff60a0f1c7ceb042b",
+                "shasum": ""
+            },
+            "require": {
+                "kleiram/transmission-php": "dev-master",
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": "3.0.*"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Transmission\\Bundle\\TransmissionBundle": ""
+                }
+            },
+            "license": [
+                "GPL-1.0+"
+            ],
+            "authors": [
+                {
+                    "name": " Dickriven Chellemboyee",
+                    "email": "chellem.void@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Symfony TransmissionBundle",
+            "keywords": [
+                "PHP Torrent Client",
+                "Transmission"
+            ],
+            "support": {
+                "source": "https://github.com/ndreux/TransmissionBundle/tree/feat-symfony-3"
+            },
+            "time": "2016-05-17 08:18:12"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.2.7",
@@ -1046,6 +1097,96 @@
             "time": "2014-01-12 16:20:24"
         },
         {
+            "name": "kleiram/transmission-php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kleiram/transmission-php.git",
+                "reference": "784a9eec46a6795a85b57ff4e79ae05b3df75017"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kleiram/transmission-php/zipball/784a9eec46a6795a85b57ff4e79ae05b3df75017",
+                "reference": "784a9eec46a6795a85b57ff4e79ae05b3df75017",
+                "shasum": ""
+            },
+            "require": {
+                "kriswallsmith/buzz": ">=0.9",
+                "symfony/property-access": ">=2.2.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Transmission": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Ramon Kleiss",
+                    "email": "ramon@cubilon.nl"
+                }
+            ],
+            "description": "PHP Transmission client",
+            "keywords": [
+                "download",
+                "torrent",
+                "transmission"
+            ],
+            "time": "2016-01-14 10:26:48"
+        },
+        {
+            "name": "kriswallsmith/buzz",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kriswallsmith/Buzz.git",
+                "reference": "d4041666c3ffb379af02a92dabe81c904b35fab8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kriswallsmith/Buzz/zipball/d4041666c3ffb379af02a92dabe81c904b35fab8",
+                "reference": "d4041666c3ffb379af02a92dabe81c904b35fab8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "suggest": {
+                "ext-curl": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Buzz": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kris Wallsmith",
+                    "email": "kris.wallsmith@gmail.com",
+                    "homepage": "http://kriswallsmith.net/"
+                }
+            ],
+            "description": "Lightweight HTTP client",
+            "homepage": "https://github.com/kriswallsmith/Buzz",
+            "keywords": [
+                "curl",
+                "http client"
+            ],
+            "time": "2015-06-25 17:26:56"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.18.2",
             "source": {
@@ -1872,16 +2013,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.0.4",
+            "version": "v3.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff"
+                "reference": "a821ed51b87f5ceda834140e5f0c06e9547a86d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff",
-                "reference": "4e17cb2ecb3fd637097ebeb871fc0e2cbdd5e7ff",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/a821ed51b87f5ceda834140e5f0c06e9547a86d4",
+                "reference": "a821ed51b87f5ceda834140e5f0c06e9547a86d4",
                 "shasum": ""
             },
             "require": {
@@ -1964,7 +2105,11 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Bridge\\": "src/Symfony/Bridge/",
+                    "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
+                    "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
+                    "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
+                    "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
+                    "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
                     "Symfony\\Bundle\\": "src/Symfony/Bundle/",
                     "Symfony\\Component\\": "src/Symfony/Component/"
                 },
@@ -1994,7 +2139,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2016-03-30 10:41:14"
+            "time": "2016-05-09 22:13:31"
         },
         {
             "name": "twig/twig",
@@ -3196,9 +3341,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "swiftmailer/swiftmailer": 0,
+        "chellem/transmission-bundle": 20,
         "behat/behat": 20
     },
     "prefer-stable": false,

@@ -1,3 +1,0 @@
-betas_mission:
-    resource: "@BetasMissionBundle/Resources/config/routing.yml"
-    prefix:   /
