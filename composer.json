@@ -1,5 +1,5 @@
 {
-  "name": "root/beta",
+  "name": "ndreux/betasmission",
   "license": "proprietary",
   "type": "project",
   "autoload": {
@@ -16,6 +16,12 @@
       "Tests\\": "tests/"
     }
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/ndreux/TransmissionBundle"
+    }
+  ],
   "require": {
     "php": ">=5.5.9",
     "symfony/symfony": "3.0.*",
@@ -28,8 +34,10 @@
     "sensio/framework-extra-bundle": "^3.0.2",
     "incenteev/composer-parameter-handler": "^2.0",
     "swiftmailer/swiftmailer": "@stable",
-    "guzzlehttp/guzzle": "^6.1"
+    "guzzlehttp/guzzle": "^6.1",
+    "chellem/transmission-bundle": "dev-feat-symfony-3@dev"
   },
+  "minimum-stability": "dev",
   "require-dev": {
     "sensio/generator-bundle": "^3.0",
     "symfony/phpunit-bridge": "^3.0",
