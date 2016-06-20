@@ -1,4 +1,0 @@
-services:
-  show_rss.command_helper.crawl:
-    class: ShowRssBundle\CommandHelper\ShowRssCrawlCommandHelper
-    arguments: ['@logger', '@transmission', "%kernel.root_dir%/../var/"]
