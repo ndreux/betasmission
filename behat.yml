@@ -23,3 +23,9 @@ default:
                 - "%paths.base%/tests/BetasMissionBundle/Features/Remove"
             contexts:
                 - Tests\BetasMissionBundle\Features\Context\RemoveContext
+
+#        Crawl:
+#            paths:
+#                - "%paths.base%/tests/ShowRssBundle/Features/Crawl"
+#            contexts:
+#                - Tests\ShowRssBundle\Features\Context\CrawlContext
