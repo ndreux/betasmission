@@ -16,4 +16,4 @@
 /web/bundles/
 /.idea
 coverage/*
-atlassian-ide-plugin.xml
+/betasmission.iml
