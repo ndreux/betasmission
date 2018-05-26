@@ -1,0 +1,30 @@
+parameters:
+    database_host:     127.0.0.1
+    database_port:     ~
+    database_name:     symfony
+    database_user:     root
+    database_password: ~
+    # You should uncomment this if you want use pdo_sqlite
+    # database_path: "%kernel.root_dir%/data.db3"
+
+    mailer_transport:  smtp
+    mailer_host:       127.0.0.1
+    mailer_user:       ~
+    mailer_password:   ~
+
+    # A secret key that's used to generate certain security-related tokens
+    secret:            ThisTokenIsNotSoSecretChangeIt
+
+    # Betaseries
+    betaseries_api_base_path: 'https://api.betaseries.com/'
+    betaseries_login: ~
+    betaseries_password_hash: ~
+    betaseries_api_key: ~
+
+    # Trakt.tv
+    trakt_tv_api_base_path: https://api-v2launch.trakt.tv
+    trakt_tv_client_id: ~
+    trakt_tv_client_secret: ~
+    trakt_tv_application_pin: ~
+    trakt_tv_access_token: ~
+    trakt_tv_refresh_token: ~
