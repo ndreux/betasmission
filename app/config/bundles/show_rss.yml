@@ -1,0 +1,3 @@
+show_rss:
+    crawler:
+        links: "%showrss_links%"
