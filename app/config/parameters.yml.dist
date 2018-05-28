@@ -22,7 +22,7 @@ parameters:
     betaseries_api_key: ~
 
     # Trakt.tv
-    trakt_tv_api_base_path: https://api-v2launch.trakt.tv
+    trakt_tv_api_base_path: 'https://api-v2launch.trakt.tv'
     trakt_tv_client_id: ~
     trakt_tv_client_secret: ~
     trakt_tv_application_pin: ~

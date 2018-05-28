@@ -18,7 +18,30 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('common');
+
+        $rootNode = $treeBuilder->root('betas_mission');
+        $rootNode
+            ->children()
+                ->arrayNode('trakt_tv')
+                    ->children()
+                        ->scalarNode('api_base_path')->defaultValue('https://api-v2launch.trakt.tv')->end()
+                        ->scalarNode('client_id')->defaultValue(null)->end()
+                        ->scalarNode('client_secret')->defaultValue(null)->end()
+                        ->scalarNode('application_pin')->defaultValue(null)->end()
+                        ->scalarNode('access_token')->defaultValue(null)->end()
+                        ->scalarNode('refresh_token')->defaultValue(null)->end()
+                    ->end()
+                ->end()
+                ->arrayNode('betaseries')
+                    ->children()
+                        ->scalarNode('api_base_path')->defaultValue('https://api.betaseries.com/')->end()
+                        ->scalarNode('login')->defaultValue(null)->end()
+                        ->scalarNode('password_hash')->defaultValue(null)->end()
+                        ->scalarNode('api_key')->defaultValue(null)->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

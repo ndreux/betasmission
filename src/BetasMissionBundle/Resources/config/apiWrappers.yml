@@ -1,8 +1,19 @@
 services:
+
   betasmission.api_wrapper.betaseries:
     class: BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper
-    arguments: ["%betaseries_login%", "%betaseries_password_hash%", "%betaseries_api_key%", "%betaseries_api_base_path%"]
+    arguments:
+      - %betas_mission.betaseries.login%
+      - '%betas_mission.betaseries.password_hash%'
+      - '%betas_mission.betaseries.api_key%'
+      - '%betas_mission.betaseries.api_base_path%'
 
   betasmission.api_wrapper.trakt_tv:
     class: BetasMissionBundle\ApiWrapper\TraktTvApiWrapper
-    arguments: ["%trakt_tv_client_id%", "%trakt_tv_client_secret%", "%trakt_tv_api_base_path%", "%trakt_tv_access_token%", "%trakt_tv_refresh_token%", "%trakt_tv_application_pin%"]
+    arguments:
+      - '%betas_mission.trakt_tv.client_id%'
+      - '%betas_mission.trakt_tv.client_secret%'
+      - '%betas_mission.trakt_tv.api_base_path%'
+      - '%betas_mission.trakt_tv.access_token%'
+      - '%betas_mission.trakt_tv.refresh_token%'
+      - '%betas_mission.trakt_tv.application_pin%'

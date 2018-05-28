@@ -1,0 +1,13 @@
+betas_mission:
+    trakt_tv:
+        api_base_path: "%trakt_tv_api_base_path%"
+        client_id: "%trakt_tv_client_id%"
+        client_secret: "%trakt_tv_client_secret%"
+        application_pin: "%trakt_tv_application_pin%"
+        access_token: "%trakt_tv_access_token%"
+        refresh_token: "%trakt_tv_refresh_token%"
+    betaseries:
+        api_base_path: "%betaseries_api_base_path%"
+        login: "%betaseries_login%"
+        password_hash: "%betaseries_password_hash%"
+        api_key: "%betaseries_api_key%"

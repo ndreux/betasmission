@@ -4,6 +4,7 @@ imports:
     - { resource: services.yml }
     - { resource: bundles/show_rss.yml }
     - { resource: bundles/transmission.yml }
+    - { resource: bundles/betasmission.yml }
 
 
 # Put parameters here that don't need to change on each machine where the app is deployed
