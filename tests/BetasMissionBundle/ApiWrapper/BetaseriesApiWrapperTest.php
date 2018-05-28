@@ -54,7 +54,7 @@ class BetaseriesApiWrapperTest extends WebTestCase
 
     /**
      *
-     * UPDATE: Do not except exception anymore. The API has been updated.
+     * UPDATE: Do not expect exception anymore. The API has been updated.
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
      */
     public function testMarkAsDownloaded()
@@ -67,7 +67,7 @@ class BetaseriesApiWrapperTest extends WebTestCase
     }
 
     /**
-     * UPDATE: Do not except exception anymore. The API has been updated.
+     * UPDATE: Do not expect exception anymore. The API has been updated.
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
      */
     public function testMarkAsWatchedFail()
