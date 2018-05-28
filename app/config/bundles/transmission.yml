@@ -1,0 +1,5 @@
+transmission:
+    host: "%transmission_host%"
+    port: "%transmission_port%"
+    username: "%transmission_user%"
+    password: "%transmission_password%"

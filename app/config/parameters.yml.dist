@@ -22,9 +22,18 @@ parameters:
     betaseries_api_key: ~
 
     # Trakt.tv
-    trakt_tv_api_base_path: https://api-v2launch.trakt.tv
+    trakt_tv_api_base_path: 'https://api-v2launch.trakt.tv'
     trakt_tv_client_id: ~
     trakt_tv_client_secret: ~
     trakt_tv_application_pin: ~
     trakt_tv_access_token: ~
     trakt_tv_refresh_token: ~
+
+    # Transmission
+    transmission_host: localhost
+    transmission_port: 9091
+    transmission_user: ~
+    transmission_password: ~
+
+    # Show RSS links
+    showrss_links: []

@@ -1,4 +1,4 @@
-FROM php:5.5-cli
+FROM php:7.0-cli
 
 RUN apt-get update && apt-get install -y \
         libicu-dev \
@@ -16,9 +16,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony
 RUN chmod a+x /usr/local/bin/symfony
 
-RUN pecl install -o -f xdebug
-COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-COPY php.ini /usr/local/etc/php/conf.d/php.ini
+RUN yes | pecl install xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN mkdir -p /var/log/betasmission
 RUN mkdir -p /mnt/smb/Labox/
@@ -32,6 +33,7 @@ RUN mkdir -p /home/pi/Downloads/Uncomplete
 WORKDIR /home/pi/betasmission
 
 EXPOSE 32775
+EXPOSE 9000
 EXPOSE 80
 
 CMD tail -f /dev/null
