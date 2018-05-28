@@ -1,8 +1,8 @@
 raspbian:
-  image: ndreux/betasmission:1.0.7
-  #build: ./build
+  #image: ndreux/betasmission:1.0.7
+  build: ./build
   volumes:
     - ./:/home/pi/betasmission
   environment:
-    - XDEBUG_CONFIG=idekey=f9AniDNdV680B8yDP
-    - PHP_IDE_CONFIG=serverName=PiLocal
+    XDEBUG_CONFIG: remote_host=192.168.0.11
+    PHP_IDE_CONFIG: serverName=PiLocal
