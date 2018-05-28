@@ -40,8 +40,6 @@ class BetaseriesApiWrapperTest extends WebTestCase
 
     /**
      * @throws \Exception
-     *
-     * @return mixed
      */
     public function testGetEpisodeData()
     {
@@ -55,12 +53,9 @@ class BetaseriesApiWrapperTest extends WebTestCase
     }
 
     /**
-     * @throws \Exception
      *
-     * @return mixed
-     *
+     * UPDATE: Do not except exception anymore. The API has been updated.
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
-     * @expectedException Exception
      */
     public function testMarkAsDownloaded()
     {
@@ -72,12 +67,8 @@ class BetaseriesApiWrapperTest extends WebTestCase
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return mixed
-     *
+     * UPDATE: Do not except exception anymore. The API has been updated.
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
-     * @expectedException Exception
      */
     public function testMarkAsWatchedFail()
     {
@@ -99,8 +90,6 @@ class BetaseriesApiWrapperTest extends WebTestCase
 
     /**
      * @throws \Exception
-     *
-     * @return mixed
      */
     public function testGetSubtitleByEpisodeId()
     {
@@ -119,7 +108,6 @@ class BetaseriesApiWrapperTest extends WebTestCase
      *
      * @expectedException Exception
      * Note : Expect to fail because the episode id is unknown
-     * @return mixed
      */
     public function testGetSubtitleByEpisodeIdFail()
     {
@@ -136,7 +124,6 @@ class BetaseriesApiWrapperTest extends WebTestCase
      *
      * @expectedException Exception
      * Note : Expect to fail because the login data are wrong
-     * @return mixed
      */
     public function testFailAuthenticate()
     {
