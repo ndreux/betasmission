@@ -1,14 +1,16 @@
 services:
 
   betasmission.api_wrapper.betaseries:
+    public: true
     class: BetasMissionBundle\ApiWrapper\BetaseriesApiWrapper
     arguments:
-      - %betas_mission.betaseries.login%
+      - '%betas_mission.betaseries.login%'
       - '%betas_mission.betaseries.password_hash%'
       - '%betas_mission.betaseries.api_key%'
       - '%betas_mission.betaseries.api_base_path%'
 
   betasmission.api_wrapper.trakt_tv:
+    public: true
     class: BetasMissionBundle\ApiWrapper\TraktTvApiWrapper
     arguments:
       - '%betas_mission.trakt_tv.client_id%'
