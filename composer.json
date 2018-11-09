@@ -28,7 +28,8 @@
     "symfony/monolog-bundle": "^2.8",
     "incenteev/composer-parameter-handler": "^2.0",
     "guzzlehttp/guzzle": "^6.1",
-    "chellem/transmission-bundle": "dev-feat-symfony-3@dev"
+    "chellem/transmission-bundle": "dev-feat-symfony-3@dev",
+    "sentry/sentry-symfony": "1.*@dev"
   },
   "minimum-stability": "dev",
   "require-dev": {
