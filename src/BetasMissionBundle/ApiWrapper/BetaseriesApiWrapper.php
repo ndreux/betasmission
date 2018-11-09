@@ -21,6 +21,8 @@ class BetaseriesApiWrapper extends AbstractApiWrapper
      * @param string      $passwordHash
      * @param string|null $apiKey
      * @param string|null $apiBasePath
+     *
+     * @throws \Exception
      */
     public function __construct($login, $passwordHash, $apiKey, $apiBasePath)
     {

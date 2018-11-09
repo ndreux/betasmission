@@ -69,6 +69,10 @@ class BetaseriesApiWrapperTest extends WebTestCase
     /**
      * UPDATE: Do not expect exception anymore. The API has been updated.
      * Note : Expect exception because Dev034 has not subscribed to A developer's life TV Show
+     *
+     * @throws Exception
+     *
+     * @expectedException Exception
      */
     public function testMarkAsWatchedFail()
     {
@@ -80,7 +84,11 @@ class BetaseriesApiWrapperTest extends WebTestCase
     }
 
     /**
+     * UPDATE: Receive an exception when the episode has already been marked as watched
+     *
      * @throws Exception
+     *
+     * @expectedException Exception
      */
     public function testMarkAsWatched()
     {
@@ -89,7 +97,7 @@ class BetaseriesApiWrapperTest extends WebTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testGetSubtitleByEpisodeId()
     {
