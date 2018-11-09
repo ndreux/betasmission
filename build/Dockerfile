@@ -21,6 +21,8 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
 
+COPY "memory-limit-php.ini" "/usr/local/etc/php/conf.d/memory-limit-php.ini"
+
 RUN mkdir -p /var/log/betasmission
 RUN mkdir -p /mnt/smb/Labox/
 ADD fixtures /mnt/smb/Labox

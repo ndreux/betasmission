@@ -37,3 +37,6 @@ parameters:
 
     # Show RSS links
     showrss_links: []
+
+    # Sentry DNC info
+    sentry_dns: ~

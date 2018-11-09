@@ -28,3 +28,6 @@ monolog:
             to_email:   'nclsdrx@gmail.com'
             subject:    An Error Occurred!
             level:      debug
+
+sentry:
+    dsn: "%sentry_dns%"tests/BetasMissionBundle/Features/Remove/Remove.feature:40
